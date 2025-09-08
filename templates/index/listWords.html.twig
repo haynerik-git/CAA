@@ -1,0 +1,34 @@
+
+
+{% for cats in categories %}
+    {% if cats.getParentCategories() is not empty %}
+        <div class="container2 tabs{{ id }}"  style="background: skyblue;">
+            {% if cats.getWordCategories() is empty %}
+                {% for cat in cats.getParentCategories() %}
+                    <a class="licatList2 cell image-checkbox" data-id='{{ cat.id }}-0' href="#cat{{ cat.id }}">
+                        <img su-media-id="{{ cat.name }}"  src="{{ asset('images/' ~ cat.icon) }}" />
+                            <i class="material-icons">select_check_box</i>
+                        <span class="title"> {{ cat.getCategoriesTranslationsByLang(app.session.get('lang')) }}</span>
+                    </a>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+{% endfor %}
+
+
+
+<div class=" container" >
+    {% for cat in  categories %}
+        {% for word in cat.getWordCategories() %}
+            {% include '/wordsSmall.html.twig' %}
+        {% endfor %}
+    {% endfor %}
+</div>
+<div class=" container" >
+    {% for cat in  categories %}
+        {% for word in cat.getSentences() %}
+            {% include '/sentence.html.twig' %}
+        {% endfor %}
+    {% endfor %}
+</div>

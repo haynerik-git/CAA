@@ -1,0 +1,74 @@
+<div class="grid-cell "
+        {% if deleteId is defined %}
+            data-id="{{ deleteId }}"
+        {% endif %}
+        {% if idCat is defined %}
+            data-catId="{{ idCat }}"
+        {% endif %}
+
+        filter="{{ cat.label|lower  }}"
+        >
+            {% if deleteId is defined %}
+                <button id="cat{{ deleteId }}" class="notPrint remove"
+                        onclick="removeItem(this,{{ deleteId }},'categorie')"
+                >
+                     <span class="material-icons">
+                        close
+                    </span>
+                </button>
+            {% endif %}
+            {% if editId is defined %}
+                <button id="cat{{ editId }}" class="notPrint edit categorieEdit"
+                        href="/categorieEditor?id={{ editId }}"
+                        data-id="{{ cat.id }}"
+                        data-title="{{ cat.label }}"
+                        data-src="{{ asset('images/' ~ cat.img) }}"
+                >
+                     <span class="material-icons">
+                        edit
+                    </span>
+                </button>
+                <button id="catVIsible{{ cat.id }}" class="notPrint gridManager "
+                        data-id="{{ cat.id }}"
+                >
+                                                 <span class="material-icons">
+                                                    grid_view
+                                                </span>
+                </button>
+            {% endif %}
+            {% if addId is defined and addId != 0 %}
+                <button id="catAdd{{ addId }}" class="notPrint add"
+                        onclick="addBlockWord( 'categorie' , {{ addId }})"
+                >
+                         <span class="material-icons">
+                            add
+                        </span>
+                </button>
+            {% endif %}
+
+            {% if hidden is defined %}
+                <button id="catHide{{ hiddenId }}" class="notPrint visible
+                            {% if hidden %}
+                                visibility
+                             {% else %}
+                                visibility_off
+                             {% endif %}
+                             "
+                        onclick="hideItem(this,{{ hiddenId }})"
+                >
+                         <span class="material-icons visibility_icon
+                                visibility
+                        ">
+                                visibility
+                        </span>
+                    <span class="material-icons visibility_off_icon">
+                                 visibility_off
+                        </span>
+                </button>
+            {% endif %}
+    <div class="containerImage">
+        <img class="imgPrint zoom"  src="{{ asset('images/' ~ cat.img) }}" alt="{{ cat.label }}" >
+        <span>{{ cat.label }}</span>
+    </div>
+{#    <input type="text" class="description" value="{{ word.getWordTranslationsByLang(app.session.get('lang'))  }}"></input>#}
+</div>

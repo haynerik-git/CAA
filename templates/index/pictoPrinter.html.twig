@@ -1,0 +1,840 @@
+{% block body %}
+    <link rel="stylesheet" type="text/css"
+          href="css/theme/jquery-ui-1.12.icon-font.min.css" />
+    <style>
+        :root {
+            --column: 5;
+            --row: 5;
+            --background: #000;
+            --backgroundCell: #fff;
+            --backgroundTab: #000;
+            --border:red;
+            --colorDescription: #000;
+            --tabsPosition:0;
+            --nbTabs: 7;
+            --colorTextTab: #fff;
+            --headerHeight:1.2cm;
+            --margeTop: 1.5cm;
+            --fontFamily:arial;
+
+        }
+
+
+        @page {
+            size: 29.7cm 21cm ;
+            background: var(--background);
+            background-repeat: no-repeat;
+            background-position: center;
+           .page {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+           }
+            /*.grid-cell {*/
+            /*    background: var(--background);*/
+            /*}*/
+            /*margin: 30mm 45mm 30mm 45mm;*/
+            /* change the margins as you want them to be. */
+            .notPrint {
+                display: none !important;
+            }
+
+        }
+
+        @media print {
+            body {
+                height: 21cm;
+                width: 29.7cm;
+                background: #fff;
+                /*padding: 2cm 0 0 0;*/
+                /*padding: 5% 0mm 0mm 0mm;*/
+                margin: 0;
+                /* change the margins as you want them to be. */
+            }
+
+            .notPrint {
+                display: none !important;
+            }
+
+            .margeTop {
+                height: var(--margeTop);
+                order: 0 !important;
+                display: block !important;
+            }
+
+            .ongletContainer {
+                order: 2 !important;
+                height: var(--headerHeight);
+            }
+
+            .grid-container {
+                order: 1 !important;
+                height: 100%;
+                background: var(--background);
+            }
+
+            .onglet {
+                height: 100% ;
+                /*height: 20%;*/
+                background: var(--backgroundTab);
+                color: #fff;
+                /* padding: 15px; */
+                width: calc(100% / var(--nbTabs));
+                margin-left: calc( (100% / var(--nbTabs) ) * var(--tabsPosition));
+                align-content: center;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                border-radius: 0 0 10px 10px !important;
+            }
+
+            input {
+                /*border: none;*/
+            }
+        }
+
+        body {
+            margin: 0;
+        }
+        .page {
+            background: var(--background);
+            background-size:100%;
+            height: 21cm;
+            width: 29.7cm;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        .header {
+            display: table-header-group;
+        }
+        .margeTop{
+            height: var(--margeTop);
+            order: 5;
+            /*display: none;*/
+        }
+        .ongletContainer {
+            width: 29.7cm;
+            margin: 0 auto;
+            background: #fff;
+            order:1;
+            height: var(--headerHeight);
+            .remove {
+                display: none;
+            }
+            &:hover .remove {
+                display: block;
+                position: absolute;
+                top: 0;
+                /*left: 0;*/
+                right: 0;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                z-index: 1;
+            }
+        }
+        .onglet {
+            height: 100% ;
+            background: var(--backgroundTab);
+            color: #fff;
+            /* padding: 15px; */
+            width: calc(100% / var(--nbTabs));
+            margin-left: calc( (100% / var(--nbTabs) ) * var(--tabsPosition));
+            align-content: center;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-radius: 10px 10px 0px 0px;
+        }
+
+        #tabName {
+            border:none;
+            background: transparent;
+            color:var(--colorTextTab);
+            font-weight: 600;
+            font-family: var(--fontFamily);
+            font-size: 26px;
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .grid-container {
+            order:2;
+            /*&::first-child{*/
+            /*    height: calc(21cm - var(--headerHeight));*/
+            /*}*/
+            height:calc(21cm - ( calc(var(--headerHeight) + var(--margeTop))));
+            width: 29.7cm;
+            /*border: 1px solid red;*/
+            /*background: darkred;*/
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            margin: 0 auto;
+
+        }
+
+        .grid-cell {
+            padding: 10px;
+            position: relative;
+            box-sizing: border-box;
+            /*background: darkblue;*/
+            flex-basis: calc(100% / var(--column));
+            height: calc(100% / var(--row));
+            color: white;
+            text-align: center;
+            /*transition: all 0.3s ease;*/
+            display: flex;
+            align-content: center;
+            flex-direction: column;
+            justify-content: center;
+            max-width: calc(100% / var(--column));
+            cursor: move;
+            /*background: var(--background);*/
+            .remove {
+                display: none;
+            }
+            /*&:nth-child(n+25) {*/
+            /*    display:none*/
+            /*}*/
+        }
+
+
+
+        .grid-cell:hover {
+            /*background: rgba(0,0,139,0.5);*/
+            .remove {
+                display: block;
+                position: absolute;
+                top: 0;
+                /*left: 0;*/
+                right: 0;
+                border-radius: 50%;
+                width: 50px;
+                height: 50px;
+                z-index: 1;
+            }
+        }
+
+        .imgPrint {
+            height: -webkit-fill-available;
+            width: fit-content;
+            align-self: center;
+            max-width: 100%;
+        }
+        @media print {
+            .page, .page-break { break-after: page; }
+        }
+
+        #btn-form {
+            position: absolute;
+            top: 0;
+            width: 100px;
+            height: 40px;
+            left: 45%;
+            border: 0;
+            background: none;
+        }
+        .containerImage {
+            background: var(--backgroundCell);
+            height:100%;
+            /*margin: 0px 5px 0;*/
+            border: 4px solid var(--border);
+            border-radius: 10px 10px 0 0;
+            border-bottom: none;
+            /*width: 450px;*/
+            /*height: 450px;*/
+        /*// margin-left: 450px;*/
+            overflow: scroll;
+            transform-origin: 0 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            cursor: crosshair;
+            &::-webkit-scrollbar {
+                width: 0;
+                height: 0;
+            }
+            img {
+                height: auto;
+                max-height: 100%;
+                width: auto;
+                align-self: center;
+                /*max-width: 100%;*/
+                transform-origin: 0 0;
+            }
+        }
+        p {
+            margin: 0;
+            color: #000;
+        }
+
+        .description{
+            border:none;
+            text-align: center;
+            background: var(--backgroundCell);
+            border: 4px solid var(--border);
+            border-radius: 0 0 10px 10px ;
+            border-top: none;
+            font-weight: 600;
+            font-family: var(--fontFamily);
+            font-size: 20px;
+            color: var(--colorDescription);
+        }
+
+
+        .drop-zone {
+            height: 97%;
+            border: 2px dashed #007bff;
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #007bff;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .drop-zone {
+            /*max-width: 200px;*/
+            height: 95%;
+            /*padding: 25px;*/
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            /*font-family: "Quicksand", sans-serif;*/
+            font-weight: 500;
+            font-size: 20px;
+            cursor: pointer;
+            color: #cccccc;
+            border: 4px dashed #009578;
+            border-radius: 10px;
+        }
+
+        .drop-zone--over {
+            border-style: solid;
+        }
+
+        .drop-zone__input {
+            display: none;
+        }
+
+        .drop-zone__thumb {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #cccccc;
+            background-size: cover;
+            position: relative;
+        }
+
+        .drop-zone__thumb::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 5px 0;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.75);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .btn-upload {
+            height: 100%;
+            top: 14%;
+            position: relative;
+        }
+
+        .menuForm {
+            background: #c3c3c3;
+            border-radius: 0 0 10px 10px;
+            margin-bottom: 20px;
+            width:100%;
+            margin: 0 auto;
+        }
+        #frm-contact {
+            display: flex;
+            h2 {
+                text-align: center;
+            }
+            & > * {
+                flex: 1 1 100px;
+                padding:10px;
+            }
+        }
+    </style>
+{#    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>#}
+    <script src='http://198.251.76.181/js/spectrum/spectrum.js'></script>
+    <link rel='stylesheet' href='http://198.251.76.181/js/spectrum/spectrum.css' />
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+<script>
+
+    $(document).ready(function() {
+        reloadResizeImage()
+
+        $("#btn-form").on("click", function() {
+
+            if ($("#frm-contact").is(":hidden")) {
+                $("#frm-contact").slideDown("slow");
+            } else {
+                $("#frm-contact").slideUp("slow");
+            }
+        });
+
+        // $('.grid-cell').draggable({ revert: true });
+
+        $(".grid-container").sortable({
+            opacity: 0.6,
+            cursor: 'move',
+            items: ".grid-cell:not(.state-disabled)"
+            // cancel: ".ui-state-disabled"
+        });
+
+
+        $( "#slider-range-max-column" ).slider({
+            range: "max",
+            min: 1,
+            max: 10,
+            value: 5,
+            slide: function( event, ui ) {
+                $('#inputSlider-range-max-column').val( ui.value)
+                myFunction_set('--column', ui.value)
+                updateHeader()
+                // $( "#column" ).val( ui.value );
+            }
+        });
+
+        $( "#slider-range-max-row" ).slider({
+            range: "max",
+            min: 1,
+            max: 10,
+            value: 5,
+            slide: function( event, ui ) {
+                $('#inputSlider-range-max-row').val( ui.value)
+                myFunction_set('--row', ui.value)
+                // $( "#column" ).val( ui.value );
+            }
+        });
+
+       var sliderNbTab =  $( "#slider-range-max-nbTabs" ).slider({
+            range: "max",
+            min: 1,
+            max: 24,
+            value: 5,
+            slide: function( event, ui ) {
+                myFunction_set('--nbTabs', ui.value)
+
+                $('#slider-range-max-positionTabs').slider("option", "max",  (ui.value - 1 ));
+
+                // $( "#column" ).val( ui.value );
+            }
+        });
+    console.log(sliderNbTab);
+        $( "#slider-range-max-positionTabs" ).slider({
+            range: "max",
+            min: 0,
+            max: 6,
+            value: 0,
+            slide: function( event, ui ) {
+                // this.val(ui.value)
+                myFunction_set('--tabsPosition', ui.value)
+                // $( "#column" ).val( ui.value );
+            }
+        });
+
+    })
+
+    // $('#tabName').onchange
+
+function updateHeader() {
+        var nbItem = $('#inputSlider-range-max-column').val() * $('#slider-range-max-column').val()
+
+        console.log(nbItem)
+}
+
+
+    var added = 0
+
+    function addBlockMissing() {
+
+        var nbItem = $('#inputSlider-range-max-column').val() * $('#inputSlider-range-max-row').val()
+        console.log(nbItem)
+        $(document).find( ".page" ).each(function() {
+            var current = $(document).find('.grid-cell').length
+            console.log(current)
+            var news = (nbItem - current)
+            for (let i = 1; i <= news; i++) {
+                addBlock()
+            }
+        });
+
+
+    }
+
+    function addBlock()
+    {
+        var classes=''
+        if(!$("#drag").is(':checked')) {
+            classes=' state-disabled'
+        }
+
+        $('.grid-container').append( '<div class="grid-cell ' + classes + '" >' +
+            '<button id="catadded'+ added +'" onclick="removeItem(this)" class="notPrint remove"><span class="material-icons">close </span></button>' +
+            '<div class="containerImage">' +
+            // '  <div class="drop-zone "><span class="drop-zone__prompt notPrint">Drop file here or click to upload</span><input id="imgInp'+ added +'"  type="file" name="myFile" class="drop-zone__input'+ added +' notPrint" onchange="preLoadImage(this, '+ added +')" ></div>' +
+
+            // '      <div id="drop-zone" class="drop-zone"> <p  for="imgInp'+ added +'">Drag & drop files here or click to upload</p></div>' +
+                ' <input accept="image/*" type="file" class="btn-upload notPrint" name="imgInp'+ added +'" id="imgInp'+ added +'"  onchange="preLoadImage(this, '+ added +')" />' +
+                '<img id="blah' + added + '" src="#" alt="your image" class="imgPrint zoom" style="display:none;" />' +
+            '</div>' +
+            '<input type="text" class="description" value="">' +
+
+            '</div>' );
+        added++
+
+
+        $(document).find('.drop-zone__input'+ added ).each(function () {
+            inputElement = $(this)
+            console.log('step 1')
+            console.log(inputElement)
+            console.log(this)
+            console.log('step 2')
+
+            // document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
+            const dropZoneElement = inputElement.closest(".drop-zone")[0];
+            console.log(dropZoneElement)
+            dropZoneElement.addEventListener("click", (e) => {
+                inputElement.click();
+            });
+            //
+            // inputElement.addEventListener("change", (e) => {
+            //     if (inputElement.files.length) {
+            //         updateThumbnail(dropZoneElement, inputElement.files[0]);
+            //     }
+            // });
+
+            dropZoneElement.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                dropZoneElement.classList.add("drop-zone--over");
+            });
+
+            ["dragleave", "dragend"].forEach((type) => {
+                dropZoneElement.addEventListener(type, (e) => {
+                    dropZoneElement.classList.remove("drop-zone--over");
+                });
+            });
+
+            dropZoneElement.addEventListener("drop", (e) => {
+                e.preventDefault();
+
+                if (e.dataTransfer.files.length) {
+                    inputElement.files = e.dataTransfer.files;
+                    updateThumbnail(dropZoneElement, e.dataTransfer.files[0]);
+                }
+
+                dropZoneElement.classList.remove("drop-zone--over");
+            });
+        });
+
+    }
+
+    function removeItem(current)
+    {
+        console.log( $(document).find('#' + current.id ))
+        $(document).find('#' + current.id ).parent().remove()
+    }
+    function preLoadImage(current, index) {
+        console.log(current.id)
+        console.log( $(document).find('#' + current.id ))
+
+        $(document).find('#' + current.id ).hide()
+        $(document).find('#' + current.id ).closest(".containerImage").find('.drop-zone' ).hide()
+        $(document).find('#blah' + index ).show()
+        $(document).find('#blah' + index )[0].src = window.URL.createObjectURL(current.files[0]);
+     //   document.getElementById('"blah' + index +'"' ).src = window.URL.createObjectURL(current.files[0]);
+        reloadResizeImage()
+    }
+
+    function reloadResizeImage() {
+        console.log('----------------------')
+        $(document).find('.containerImage').each(function () {
+            const container = this,
+                $container = $(this),
+                $image = $container.find('img'),
+
+                factor = 0.1,
+                maxScale = 6;
+            console.log($image)
+            let previousX = 0,
+                previousY = 0,
+                scale = 1;
+            $image.draggable({ scroll: true });
+            $container.on('mousedown', function (e) {
+                e.preventDefault();
+                previousX = e.pageX;
+                previousY = e.pageY;
+            });
+            $container.on('mousemove', function (e) {
+                if (e.buttons) {
+                    let dragX = 0,
+                        dragY = 0;
+                    if (e.pageX - previousX !== 0) {
+                        dragX = previousX - e.pageX;
+                        previousX = e.pageX;
+                    }
+                    if (e.pageY - previousY !== 0) {
+                        dragY = previousY - e.pageY;
+                        previousY = e.pageY;
+                    }
+                    // if (dragX !== 0 || dragY !== 0) {
+                    //     container.scrollBy(dragX, dragY);
+                    //     console.log(`scrollBy(${dragX}, ${dragY});`);
+                    // }
+                }
+            });
+            $container.on('wheel', function (e) {
+                e.preventDefault();
+                let delta = getDelta(e.originalEvent),
+                    mouse = {
+                        x: e.pageX - e.target.offsetLeft,
+                        y: e.pageY - e.target.offsetTop
+                    },
+                    offset = {
+                        x: container.scrollLeft,
+                        y: container.scrollTop
+                    },
+                    imageLoc = {
+                        // x: e.pageX + offset.x,
+                        // y: e.pageY + offset.y
+                        x: mouse.x + offset.x,
+                        y: mouse.y + offset.y
+                    },
+                    zoomPoint = {
+                        x: imageLoc.x / scale,
+                        y: imageLoc.y / scale
+                    };
+                console.log(`delta: ${delta}`);
+                scale += delta * factor * scale;
+                scale = clamp(scale, 0.1, maxScale);
+                let newZoomPoint = {
+                    x: zoomPoint.x * scale,
+                    y: zoomPoint.y * scale
+                };
+                let newScroll = {
+                    // x: newZoomPoint.x - e.pageX,
+                    // y: newZoomPoint.y - e.pageY
+                    x: newZoomPoint.x - mouse.x,
+                    y: newZoomPoint.y - mouse.y
+                };
+                console.log(`mouse: ${mouse}`);
+                console.log(`Scale: ${scale}`);
+                $image.css('transform', `scale(${scale})`);
+                container.scrollTop = newScroll.y;
+                container.scrollLeft = newScroll.x;
+                console.log(`Scroll: ${container.scrollTop}x${container.scrollLeft}`);
+            });
+        });
+
+
+        function clamp(value, min, max)
+        {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function getDelta(event) {
+            let delta = event.delta || event.wheelDelta || -event.deltaY;
+            if(delta === undefined) {
+                delta = event.originalEvent.detail;
+            }
+            console.log(delta);
+            return clamp(delta, -1, 1);
+        }
+
+
+    }
+
+    var r = document.querySelector(':root');
+
+    // Create a function for getting a variable value
+    function myFunction_get() {
+        // Get the styles (properties and values) for the root
+        var rs = getComputedStyle(r);
+        // Alert the value of the --blue variable
+        // alert("The value of --blue is: " + rs.getPropertyValue('--blue'));
+    }
+
+    // Create a function for setting a variable value
+    function myFunction_set(key,value) {
+        // Set the value of variable --blue to another value (in this case "lightblue")
+        r.style.setProperty(key, value);
+    }
+
+function toggleDrag() {
+    $(".grid-container").sortable("destroy");
+
+
+    if($("#drag").is(':checked')) {
+        $(document).find('.grid-cell').removeClass('state-disabled')
+    }else{
+        $(document).find('.grid-cell').addClass('state-disabled')
+    }
+        // $('.grid-cell').toggleClass('state-disabled')
+
+
+    // $(".grid-container").sortable("enable");
+    $(".grid-container").sortable({
+        opacity: 0.6,
+        cursor: 'move',
+        items: ".grid-cell:not(.state-disabled)"
+        // cancel: ".ui-state-disabled"
+    });
+
+    }
+
+
+</script>
+<body>
+<div class="notprint menuForm">
+    <button onclick="addBlock()"> <span class="material-icons">add</span></button>
+    <button onclick="addBlockMissing()"> <span class="material-icons">add missing</span></button>
+    <button id="btn-form">  <span class="material-icons">swap_vert</span></button>
+        <div id="frm-contact">
+            <div>
+                <h2>Basic</h2>
+    {#               col <input type="text" id="column" name="column" value="5" >#}
+    {#               row <input type="text" id="row" name="row" value="5" onchange="myFunction_set('--row', this.value)">#}
+                background <input type="color" name="background" value="#000000" onchange="myFunction_set('--background', this.value)">
+
+                Font family
+                <select onchange="myFunction_set('--fontFamily', this.value)">
+                    <option value="arial">Arial</option>
+                    <option value="Impact, fantasy">Impact, fantasy</option>
+                    <option value="Chalkduster, fantasy">Chalkduster, fantasy</option>
+                    <option value=" Verdana">Verdana</option>
+                    <option value="Comic Sans MS, Comic Sans, cursive">Comic Sans Serif</option>
+                    <option value="Trebuchet MS">Trebuchet MS</option>
+                </select>
+
+
+                <br>
+                   Col
+                    <div id="slider-range-max-column"></div>
+                    <input id="inputSlider-range-max-column" value="5" style="display: none"/>
+                    <br>
+                   Row
+                    <div id="slider-range-max-row"></div>
+                <input id="inputSlider-range-max-row" value="5"  style="display: none"/>
+                  <br>
+                Drag and drop <input type="checkbox" id="drag" name="drag" onclick="toggleDrag()">
+                <br>
+
+
+            </div>
+            <div>
+                <h2>Tabs</h2>
+                Color text tabs <input type="color" name="colorTextTabs" value="#ffffff" onchange="myFunction_set('--colorTextTab', this.value)">
+                Background Tab <input type="color" name="backgroundTextTabs" value="#000000" onchange="myFunction_set('--backgroundTab', this.value)">
+<br>
+                Nb tabs
+                    <div id="slider-range-max-nbTabs"></div>
+{#                    <input type="text" name="nbTabs" value="7" onchange="myFunction_set('--nbTabs', this.value)">#}
+                    <br>
+                    Tabs position
+                    <div id="slider-range-max-positionTabs"></div>
+{#                    <input type="text" name="posTabs" value="0" onchange="myFunction_set('--tabsPosition', this.value)">#}
+                </div>
+            <div>
+                <h2>Box</h2>
+                background cell <input type="color" name="backgroundCell" value="#ffffff" onchange="myFunction_set('--backgroundCell', this.value)">
+                border <input type="color" name="bordercolor" value="#ff0000" onchange="myFunction_set('--border', this.value)">
+                Text Color <input type="color" name="descriptioncolor" value="#000000" onchange="myFunction_set('--colorDescription', this.value)">
+            </div>
+        </div>
+</div>
+<div class="page">
+    <div class="margeTop">&nbsp;</div>
+    <div id="grid-container"  class="grid-container">
+
+{#    <div class="grid-cell">#}
+{#        <div class="workspace">#}
+{#            <h1>Scroll with Wheel or Trackpad</h1>#}
+{#        </div>#}
+{#        <img id="image" src="http://198.251.76.181:8080/assets/images/loui-15a30505b4d24584533ccea24fb6e25d.jpg" alt="Picture">#}
+
+{#    </div>#}
+        {% set id = 0 %}
+        {% set level = 2 %}
+{#        {% set cats =cats.parentCategories() %}#}
+{#        {% for cat in cats|sort((a, b) => a.getDisplayOrder() <=> b.getDisplayOrder()) %}#}
+
+
+                    {% for word in cat.getWordCategories()|sort((a, b) => a.getDisplayOrder() <=> b.getDisplayOrder()) %}
+                        {% set id = id+1 %}
+                         <div class="grid-cell state-disabled" >
+                             <button id="cat{{ word.id }}" class="notPrint remove" onclick="removeItem(this)">
+                                 <span class="material-icons">
+                                    close
+                                </span>
+                             </button>
+                             <div class="containerImage">
+
+                                 <img class="imgPrint zoom"  src="{{ asset('images/' ~ word.filename) }}" alt="{{ word.name }}" >
+                             </div>
+                             <input type="text" class="description" value="{{ word.getWordTranslationsByLang(app.session.get('lang'))  }}"></input>
+                         </div>
+                        {% if loop.index is divisible by(25) or (loop.last) %}
+                                </div>
+                            <div class=" ongletContainer" >
+                                <div class="onglet">
+                                    <input type="text" id="tabName" value="{{ cat.getCategoriesTranslationsByLang(app.session.get('lang')) }}">
+                                    <button id="cat{{ cat.id }}" class="notPrint remove" onclick="removeCarItem(this)">
+                                         <span class="material-icons">
+                                            close
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                            </div>
+{#<div class="page-break"></div>#}
+                            {% if loop.index is divisible by(25) %}
+                                <div class="page">
+                                    <div class="margeTop">&nbsp;</div>
+
+                                    <div id="grid-container"  class="grid-container">
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+            </div>
+{#            <div class="page-break"></div>#}
+{#            {% if loop.last == false %}#}
+{#                <div class="grid-container">#}
+{#            {% endif %}#}
+{#        {% endfor %}#}
+{#    </div>#}
+
+</div>
+{#    </div>#}
+{#    <div class=”sheet-outer A4">#}
+{#    <section class=”sheet”>#}
+
+
+
+{#    </section>#}
+{#    </div>#}
+
+</body>
+{% endblock %}

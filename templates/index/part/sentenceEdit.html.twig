@@ -1,0 +1,49 @@
+{% set sizeCellClass = '' %}
+{% if pageOrder is defined and pageOrder.sizeCell is defined and pageOrder.sizeCell is not null %}
+    {% set sizeCellClass = 'grid-cell-'  ~  pageOrder.sizeCell %}
+{% endif %}
+<div class="grid-cell
+        {{ sizeCellClass }}"
+        {% if deleteId is defined %}
+            data-id="{{ deleteId }}"
+        {% endif %}
+     filter="{{ sentence.getSentenceTranslationsByLang(app.session.get('lang'))|lower  }}"
+>
+    {% if deleteId is defined %}
+        <button id="cat{{ deleteId }}" class="notPrint remove"
+                onclick="removeItem(this,{{ deleteId }},'sentence')"
+        >
+                     <span class="material-icons">
+                        close
+                    </span>
+        </button>
+    {% endif %}
+    {% if editId is defined %}
+        <button id="sentence{{ editId }}" class="notPrint edit sentenceEdit"
+                href="/sentenceEditor?id={{ editId }}"
+                data-id="{{ sentence.id }}"
+                data-title="{{ sentence.getSentenceTranslationsByLang(app.session.get('lang')) }}"
+                {% for lang in langs %}
+                    data-title{{ lang.name }}="{{ sentence.getSentenceTranslationsByLang(lang.id) }}"
+                {% endfor %}
+        >
+                     <span class="material-icons">
+                        edit
+                    </span>
+        </button>
+    {% endif %}
+    {% if addId is defined and addId != 0 %}
+        <button id="catAdd{{ addId }}" class="notPrint add"
+                onclick="addBlockWord( 'sentence' , {{ addId }})"
+        >
+                         <span class="material-icons">
+                            add
+                        </span>
+        </button>
+    {% endif %}
+    <div class="containerImage">
+        <img class="imgPrint zoom"  src="{{ asset('images/' ~ sentence.filename) }}" alt="{{ sentence.getSentenceTranslationsByLang(app.session.get('lang')) }}" >
+        <span>{{ sentence.getSentenceTranslationsByLang(app.session.get('lang')) }}</span>
+    </div>
+    {#    <input type="text" class="description" value="{{ word.getWordTranslationsByLang(app.session.get('lang'))  }}"></input>#}
+</div>

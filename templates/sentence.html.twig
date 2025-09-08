@@ -1,0 +1,18 @@
+<div class='card slide'  data-slide-index='{{ (loop.index - 1 ) }}'  onclick='selectCombination({{ word.id }})'>
+    <div class='card-bg' >
+        <img src='{{ asset('images/' ~ word.filename) }}' style='max-width: 75vw;
+                                position: relative;
+                                margin: 0 auto;
+                                text-align: center;
+                                align-items: center;
+                                justify-content: center;
+                                display: flex;
+                                width: auto;
+                                border-radius: 10px;'>
+        <div class='gloss' ></div>
+        <div class='text'>{{ word.name }}</div>
+{#        {% for trad in word.getSentencesTranslationsFilterByLang() %}#}
+{#            {{ trad.lang }} {{ trad.sentence }}#}
+{#        {% endfor %}#}
+    </div>
+</div>

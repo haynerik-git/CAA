@@ -1,0 +1,38 @@
+
+
+<div id="grid-container" class="grid-container-menu ">
+    <div class="grid-cell grid-cell-menu ">
+        <div class="containerImage">
+            <a href="/">
+                <img src="/img/home.png">
+                <span>Home</span>
+            </a>
+        </div>
+    </div>
+    <div class="grid-cell grid-cell-menu " onclick="{% if page.autoSpeak %}speak();{% else %}speakIa(){% endif %}">
+        <div class="containerImage">
+            <img src="/img/speaker.png">
+            <span>{% if page.autoSpeak %}Repeat {% else%}Speak {% endif %}</span>
+        </div>
+    </div>
+
+    <div class="grid-cell grid-cell-menu grid-cell-input">
+        <div class="containerImage">
+            <input id='txt' type="text" value="" />
+        </div>
+    </div>
+
+    <div class="grid-cell grid-cell-menu " onclick="$('.categories-container').show();$('.word-container').hide();">
+        <div class="containerImage">
+            <img src="/img/back.png">
+            <span>Back</span>
+        </div>
+    </div>
+
+    <div class="grid-cell grid-cell-menu " onclick="cleanTxt()">
+        <div class="containerImage">
+            <img src="/img/delete.png">
+            <span>Clear</span>
+        </div>
+    </div>
+</div>

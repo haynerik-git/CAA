@@ -1,0 +1,129 @@
+{% extends 'baseclean.html.twig' %}
+
+{% block body %}
+    <style>
+        :root {
+            --column: {{ col }};
+            --row: {{ row }};
+            --background: {{ page.background }};
+            --backgroundCell: {{ page.backgroundCell }};
+            --backgroundTab: #000;
+            --border:{{ page.border }};
+            --colorDescription: {{ page.colorDescription }};
+            --tabsPosition:0;
+            --nbTabs: 7;
+            --colorTextTab: #fff;
+            --headerHeight:1.2cm;
+            --margeTop: 1.5cm;
+            --fontFamily:{{ page.font }};
+            --size: clamp(250px, 50vmin);
+            @media screen and (max-width: 640px) {
+                /*--column: 4;*/
+                /*--row: 4;*/
+            }
+        }
+
+        @media screen and (max-width: 640px) {
+            .empty {
+                /*display: none !important;*/
+            }
+        }
+
+    </style>
+
+
+{% include('/index/menu/menu.html.twig') %}
+
+    <div id="grid-container"  class="grid-container categories-container">
+        {% set orders = pageOrders %}
+        {% set CategoriesID = [{ k: 'vide'}] %}
+        {% set array = [{ k: 'vide', v: 'vide' }] %}
+        {% include '/index/order/order.html.twig' %}
+    </div>
+
+    <div >
+        {% for pageOrder in pageOrders|sort((a, b) => a.getOrderDisplay() <=> b.getOrderDisplay()) %}
+            {% if pageOrder.type == 'categorie' and { k: pageOrder.getUserCategories().id } not in CategoriesID %}
+
+                {% set CategoriesID = CategoriesID|merge([ { k: pageOrder.getUserCategories().id } ]) %}
+
+                    <div class="grid-container word-container displayTabs{{ pageOrder.getUserCategories().id }}" >
+                        {% set orders = pageOrder.getUserCategories().getUserCategoriesOrders() %}
+                        {% include('/index/order/order.html.twig') %}
+
+                        <div id="pagination-container{{ pageOrder.getUserCategories().id }}">
+                            <div></div>
+                        </div>
+                        <script>
+                            $(document).ready(function() {
+                                {#$(".displayTabs{{ cat.id }}").pagify(16, ".grid-cell");#}
+
+                                var items = $(".displayTabs{{ pageOrder.getUserCategories().id }} .grid-cell");
+                                var numItems = items.length;
+                                var perPage = {{ row * col }};
+                                items.slice(perPage).hide();
+
+                                $('#pagination-container{{ pageOrder.getUserCategories().id }}').pagination({
+                                    items: numItems,
+                                    itemsOnPage: perPage,
+                                    displayedPages: 0,
+                                    edges: 0,
+                                    // prevText: "&laquo;",
+                                    // nextText: "&raquo;",
+                                    onPageClick: function (pageNumber) {
+                                        var showFrom = perPage * (pageNumber - 1);
+                                        var showTo = showFrom + perPage;
+                                        items.hide().slice(showFrom, showTo).show();
+                                    }
+                                });
+                            })
+                        </script>
+                    </div>
+            {% endif %}
+        {% endfor %}
+
+        {% for cat in cats %}
+
+
+            <div class="grid-container word-container displayTabs{{ cat.id }}" >
+
+                {% set orders = cat.getUserCategoriesOrders() %}
+                {% include('/index/order/order.html.twig') %}
+
+                <div id="pagination-container{{ cat.id }}">
+                    <div></div>
+                </div>
+                <script>
+                    $(document).ready(function() {
+                        {#$(".displayTabs{{ cat.id }}").pagify(16, ".grid-cell");#}
+
+                        var items = $(".displayTabs{{ cat.id }}").first().find(".grid-cell");
+                        var numItems = items.length;
+                        var perPage = {{ row * col }};
+                        items.slice(perPage).hide();
+
+                        $('#pagination-container{{ cat.id }}').pagination({
+                            items: numItems,
+                            itemsOnPage: perPage,
+                            displayedPages: 0,
+                            edges: 0,
+                            // prevText: "&laquo;",
+                            // nextText: "&raquo;",
+                            onPageClick: function (pageNumber) {
+                                var showFrom = perPage * (pageNumber - 1);
+                                var showTo = showFrom + perPage;
+                                items.hide().slice(showFrom, showTo).show();
+                            }
+                        });
+                    })
+                </script>
+            </div>
+        {% endfor %}
+
+    </div>
+
+
+    <script>
+        $('.word-container').hide();
+    </script>
+{% endblock %}

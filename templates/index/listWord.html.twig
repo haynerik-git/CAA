@@ -1,0 +1,23 @@
+{% block body %}
+    {% set id = 9999999 %}
+    {% set action = "removeWord" %}
+    {% set sentence = "" %}
+{#    {{ words | length }}#}
+    <div class='owl-carousel owl-theme owl-carousel-words'>
+        {% for word in words %}
+            {% include '/wordsSmall.html.twig' %}
+            {% set sentence = sentence ~ " " ~ word.getWordTranslationsByLang(app.session.get('lang'))  %}
+        {% endfor %}
+    </div>
+    <input type="text" id="txt" value="{{ sentence }}" style="display:none;"></input>
+    <script>
+
+        $(document).ready(function() {
+            var carroussel = createSliderSentences('owl-carousel-words',1, {{ words | length }});
+            {#$('.owl-carousel-words').slick('slickGoTo', {{ (words | length) - 1 }}, false)#}
+            {#$("#tabstest{{ id }}").tabs().trigger("create");#}
+        });
+    </script>
+
+
+{% endblock %}

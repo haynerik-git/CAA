@@ -1,0 +1,183 @@
+{% for pageOrder in orders|sort((a, b) => a.getOrderDisplay() <=> b.getOrderDisplay()) %}
+    {% set sizeCellClass = '' %}
+
+    {% if pageOrder is defined and pageOrder.sizeCell is defined and pageOrder.sizeCell is not null %}
+{#        set {{ pageOrder.sizeCell }}#}
+        {% set sizeCellClass = 'grid-cell-'  ~  pageOrder.sizeCell %}
+        {% if pageOrder.sizeCell == '1-1' %}
+            {% for i in 1..( col - 1 ) %}
+                 <div class="grid-cell hide">{{ ( col - 1 ) }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+
+    {% if  pageOrder is defined and pageOrder.hidden is defined  and pageOrder.hidden %}
+        {% set sizeCellClass = sizeCellClass ~ ' disabledCard ' %}
+    {% endif %}
+
+    {% if pageOrder.type == 'empty' or ( pageOrder.hidden  is defined  and pageOrder.hidden ) %}
+        <div class="grid-cell {{ sizeCellClass }} grid-cell-empty">
+            <div class="containerImage">
+                <span></span>
+            </div>
+        </div>
+    {% elseif pageOrder.type == 'categorie'  %}
+
+        <div class="grid-cell {{ sizeCellClass }}" onclick="$('.categories-container').hide();$('.word-container').hide();$('.displayTabs{{ pageOrder.getUserCategories().id }}').first().show();">
+            <div class="containerImage" style="background:
+            {% if pageOrder.getUserCategories().getType() is not null %}
+                {{ pageOrder.getUserCategories().getType().color }};
+            {% endif %}">
+                <img src="{{ asset('images/' ~ pageOrder.getUserCategories().img) }}" />
+                <span class="text-overlay"> {{ pageOrder.getUserCategories().label }}</span>
+            </div>
+            <span class="material-icons folder">
+                            folder_open
+                        </span>
+        </div>
+    {% elseif pageOrder.type == 'input' %}
+        <div class="grid-cell {{ sizeCellClass }}">
+            <div class="containerImage">
+                <input type="text" id="txt" />
+            </div>
+        </div>
+    {% elseif pageOrder.type == 'word' %}
+        <div class="grid-cell {{ sizeCellClass }}"
+             onclick='actionWord("{{ pageOrder.getWord().id }}", "{{ pageOrder.getWord().getWordTranslationsByLang(app.session.get('lang')) }}", {{ pageOrder.getWord().id }}, 1);
+                     $(this).toggleClass("image-checkbox-checked")
+                     '
+             data-wordId="{{ pageOrder.getWord().id }}"
+             data-wordName="{{ pageOrder.getWord().getWordTranslationsByLang(app.session.get('lang')) }}"
+             data-catId="{{ pageOrder.getWord().id }}"
+        >
+            <div class="containerImage" style="background:
+            {% if pageOrder.getWord().getType() is not null %}
+                {{ pageOrder.getWord().getType().color }};
+            {% endif %}">
+                <img src="{{ asset('images/' ~ pageOrder.getWord().filename) }}" />
+                <span>{{ pageOrder.getWord().getWordTranslationsByLang(app.session.get('lang')) }}
+
+                </span>
+            </div>
+            {#                    <span class="material-icons folder">#}
+            {#                            stars#}
+            {#                    </span>#}
+        </div>
+    {% elseif pageOrder.type == 'action' %}
+        <div class="grid-cell {{ sizeCellClass }}"
+             onclick='{{ pageOrder.getAction().actionJS }}'
+        >
+            <div class="containerImage">
+                <img src="{{ asset('img/speaker.jpg') }}" />
+                <span>{{ pageOrder.getAction().title }}</span>
+            </div>
+        </div>
+    {% elseif pageOrder.type == 'youtube' %}
+        <div class="grid-cell {{ sizeCellClass }}"
+             onclick=''
+        >
+            <div class="containerImage">
+                <iframe width="100%" height="100%" src="{{ pageOrder.getYoutube().url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+        </div>
+
+    {% elseif pageOrder.type == 'sentence' %}
+        <div class="grid-cell {{ sizeCellClass }}"
+             onclick='selectCombination({{ pageOrder.getSentence().id }})'
+        >
+            <div class="containerImage">
+                <img src="{{ asset('images/' ~ pageOrder.getSentence().filename) }}" />
+                <span>{{ pageOrder.getSentence().getSentenceTranslationsByLang(app.session.get('lang')) }}</span>
+            </div>
+            <span class="material-icons folder">
+                            campaign
+                    </span>
+        </div>
+
+    {% endif %}
+{% endfor %}
+
+
+<div id="categorie-pagination-container">
+    <div></div>
+</div>
+<script>
+
+    // Requires jQuery
+
+    $(document).on('click','.js-menu_toggle.closed',function(e){
+        e.preventDefault(); $('.list_load, .list_item').stop();
+        $(this).removeClass('closed').addClass('opened');
+
+        $('.side_menu').css({ 'left':'0px' });
+
+        var count = $('.list_item').length;
+        $('.list_load').slideDown( (count*.6)*100 );
+        $('.list_item').each(function(i){
+            var thisLI = $(this);
+            timeOut = 100*i;
+            setTimeout(function(){
+                thisLI.css({
+                    'opacity':'1',
+                    'margin-left':'0'
+                });
+            },100*i);
+        });
+    });
+
+    $(document).on('click','.js-menu_toggle.opened',function(e){
+        e.preventDefault(); $('.list_load, .list_item').stop();
+        $(this).removeClass('opened').addClass('closed');
+        // $(this).toggleClass('hide');
+
+        $('.side_menu').css({ 'left':'-250px' });
+
+        var count = $('.list_item').length;
+        $('.list_item').css({
+            'opacity':'0',
+            'margin-left':'-20px'
+        });
+        $('.list_load').slideUp(300);
+    });
+
+
+    $(document).ready(function() {
+        {#$(".displayTabs{{ cat.id }}").pagify(16, ".grid-cell");#}
+
+        // $('.openMenu').click(function () {
+        //     if ($('#navigator').css("left") == "-250px") {
+        //         $('#navigator').animate({left: '0px'}, 350);
+        //         $('.menu-icon').animate({left: '250px'}, 350);
+        //         $('.menu-text').animate({left: '300px'}, 350).empty().text("Close");
+        //     }
+        //     else  {
+        //         $('#navigator').animate({left: '-250px'}, 350);
+        //         $(this).animate({left: '0px'}, 350);
+        //         $('.menu-text').animate({left: '50px'}, 350).empty().text("Menu");
+        //
+        //     }
+        // });
+
+
+        // var items = $(".categories-container .grid-cell");
+        var items = $(".categories-container").first().find(".grid-cell");
+
+        var numItems = items.length;
+        var perPage = {{ row * col }};
+        items.slice(perPage).hide();
+
+        $('#categorie-pagination-container').pagination({
+            items: numItems,
+            itemsOnPage: perPage,
+            displayedPages: 0,
+            edges: 0,
+            // prevText: "&laquo;",
+            // nextText: "&raquo;",
+            onPageClick: function (pageNumber) {
+                var showFrom = perPage * (pageNumber - 1);
+                var showTo = showFrom + perPage;
+                items.hide().slice(showFrom, showTo).show();
+            }
+        });
+    })
+</script>

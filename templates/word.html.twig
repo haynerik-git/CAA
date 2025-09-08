@@ -1,0 +1,18 @@
+{#<div class=' slide post item {{ word.name }}' data-filter-slide-1="{{ word.name }}"  data-slide-index='{{ (loop.index - 1 ) }}' cat="{{ word.name }}" >#}
+{#    <div class='card'>#}
+    {% if action  is not defined %}
+        {% set action = "actionWord" %}
+    {% endif %}
+
+<div class="second hero" onclick='{{ action }}("{{ word.id }}", "{{ word.getWordTranslationsByLang(app.session.get('lang')) }}", {{ cat.id }}, {{ (id + 1) }})'>
+    <img class="hero-profile-img" src="{{ asset('images/' ~ word.filename) }}" alt=""  style='max-width: 45vw;'>
+    <div class="hero-description-bk">
+        <div class="hero-description">
+            <p><b>{{ word.getWordTranslationsByLang(app.session.get('lang')) }}</b></p>
+        </div>
+    </div>
+    {#    <div class="hero-logo">#}
+    {#        <img src="https://miscmedia-9gag-fun.9cache.com/images/thumbnail-facebook/1557291375.3948_Dy2yZu_n.jpg" alt="">#}
+    {#    </div>#}
+
+</div>

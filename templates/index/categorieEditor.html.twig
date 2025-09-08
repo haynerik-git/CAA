@@ -1,0 +1,1052 @@
+{% extends 'baseclean.html.twig' %}
+
+{% block body %}
+    <link rel="stylesheet" type="text/css"
+          href="css/theme/jquery-ui-1.12.icon-font.min.css" />
+    <style>
+        :root {
+            --column: {{ col ?? 2 }};
+            --row: {{ row ?? 2 }};
+            --background: {{ page.background|default('#ffffff') }};
+            --backgroundCell: {{ page.backgroundCell }};
+            --backgroundTab: #000;
+            --border:{{ page.border }};
+            --colorDescription: {{ page.colorDescription }};
+            --tabsPosition:0;
+            --nbTabs: 7;
+            --colorTextTab: {{ page.colorDescription }};
+            --headerHeight:1.2cm;
+            --margeTop: 1.5cm;
+            --fontFamily:{{ page.font }};
+
+            --gray-light: #eee;
+            --gray-dark: #333;
+            --focus-blue: #1976d2;
+            --size: clamp(250px, 50vmin, 300px);
+        }
+
+    </style>
+    <link href="{{ asset('styles/editor.css') }}" rel="stylesheet" />
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.4/cropper.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+<script>
+
+    $(document).ready(function() {
+
+        let result = document.querySelector('.result'),
+            img_result = document.querySelector('.img-result'),
+            img_w = document.querySelector('.img-w'),
+            img_h = document.querySelector('.img-h'),
+            options = document.querySelector('.options'),
+            save = document.querySelector('.save'),
+            cropped = document.querySelector('.cropped'),
+            dwn = document.querySelector('.download'),
+            upload = document.querySelector('#file-input'),
+            cropper = '';
+
+// on change show image with crop options
+        upload.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                // start file reader
+                const reader = new FileReader();
+                reader.onload = (e)=> {
+                    if(e.target.result){
+                        // create new image
+                        let img = document.createElement('img');
+                        img.id = 'image';
+                        img.src = e.target.result
+                        // clean result before
+                        result.innerHTML = '';
+                        // append new image
+                        result.appendChild(img);
+                        // show save btn and options
+                        // save.classList.remove('hide');
+                        // options.classList.remove('hide');
+                        // init cropper
+                        cropper = new Cropper(img,
+                            {
+                                autoCropArea: 1,
+                                autoCrop: true,
+                                // viewMode: 0,
+                                // background: false,
+                                modal: true,
+                                zoomable: true,
+                                responsive: false,
+                            }
+                        );
+                    }
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+// save on click
+        save.addEventListener('click',(e)=>{
+            e.preventDefault();
+            let imgSrc = null;
+            // get result to data uri
+            try {
+                imgSrc = cropper.getCroppedCanvas({
+                    width: img_w.value // input value
+                }).toDataURL();
+
+                // remove hide class of img
+                cropped.classList.remove('hide');
+                img_result.classList.remove('hide');
+                // show image cropped
+                cropped.src = imgSrc;
+            } catch (error) {
+                console.error(error);
+                // Expected output: ReferenceError: nonExistentFunction is not defined
+                // (Note: the exact output may be browser-dependent)
+            }
+
+            // dwn.classList.remove('hide');
+            // dwn.download = 'imagename.png';
+            // console.log(imgSrc)
+            // dwn.setAttribute('href',imgSrc);
+            id = $('#idGeneric').val()
+            type = $('#typeGeneric').val()
+            action = $('#actionGeneric').val()
+            data =     { id: id, name: $('#titleGeneric').val(), type: type , action: action, img: imgSrc }
+            {% for lang in langs %}
+            data.{{lang.name }} = $('#titleGeneric{{ lang.name }}').val()
+            {% endfor %}
+            $.ajax({
+                method: "POST",
+                url: "/pageEditor/updateImage",
+                data: data
+            })
+                .done(function( msg ) {
+                    // alert( "Data Saved: " + msg );
+                    // $('.grid-container').append( msg);
+                });
+
+            // cropper.destroy()
+            // alert('done')
+        });
+
+
+
+        document.querySelector('.clearCropper').addEventListener('click',(e)=>{
+            e.preventDefault();
+            cropper.destroy()
+            // cropper.clear()
+            // cropper.reset()
+            $('.result').html('')
+            $('#file-input').val('')
+            // $('#imageResult').attr('src', '' )
+
+        })
+
+        dialog = $( "#dialog-form" ).dialog({
+            autoOpen: false,
+            height: 768,
+            width: "90%",
+            maxWidth: "768px",
+            modal: true,
+            buttons: {
+                "Create an Word": function() {
+                    document.querySelector('.save').click()
+                    document.querySelector('.clearCropper').click()
+                    // console.log($)
+                  // addBlockWord('word', 7)
+                } ,
+                Cancel: function() {
+                    dialog.dialog( "close" );
+                    document.querySelector('.clearCropper').click()
+                }
+            },
+            close: function() {
+                document.querySelector('.clearCropper').click()
+                // form[ 0 ].reset();
+                // allFields.removeClass( "ui-state-error" );
+            }
+        });
+
+        $( ".wordAdd" ).on( "click", function() {
+            // id = $(this).attr('data-id')
+            // title = $(this).attr('data-title')
+            $('#typeGeneric').val('word')
+            {% for lang in langs %}
+                $('#titleGeneric{{ lang.name }}').val('')
+            {% endfor %}
+            $('#actionGeneric').val('add')
+            $('#idGeneric').val('')
+            $('#titleGeneric').val('')
+            $('.result').html('')
+            $('#imageResult').attr('src', '' )
+            $('#dialog-form').parent().find('.ui-dialog-title').first().html('Add word')
+            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('Add word')
+            // fieldForm(id)
+            dialog.dialog( "open" );
+        });
+
+        $( ".categorieAdd" ).on( "click", function() {
+            // id = $(this).attr('data-id')
+            // title = $(this).attr('data-title')
+            $('#typeGeneric').val('categorie')
+            $('#actionGeneric').val('add')
+            $('#idGeneric').val('')
+            $('#titleGeneric').val('')
+            $('.result').html('')
+            {% for lang in langs %}
+                $('#titleGeneric{{ lang.name }}').val('')
+            {% endfor %}
+            $('#imageResult').attr('src', '' )
+            $('#dialog-form').parent().find('.ui-dialog-title').first().html('New categorie')
+            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('New categorie')
+            // fieldForm(id)
+            dialog.dialog( "open" );
+        });
+
+        $( ".sentenceAdd" ).on( "click", function() {
+            // id = $(this).attr('data-id')
+            // title = $(this).attr('data-title')
+            $('#typeGeneric').val('sentence')
+            $('#actionGeneric').val('add')
+            $('#idGeneric').val('')
+            $('#titleGeneric').val('')
+            $('.result').html('')
+            {% for lang in langs %}
+                $('#titleGeneric{{ lang.name }}').val('')
+            {% endfor %}
+            $('#imageResult').attr('src', '' )
+            $('#dialog-form').parent().find('.ui-dialog-title').first().html('New Sentence')
+            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('New Sentence')
+            // fieldForm(id)
+            dialog.dialog( "open" );
+        });
+
+
+        $( ".wordEdit" ).on( "click", function() {
+            id = $(this).attr('data-id')
+
+            title = $(this).attr('data-title')
+            src = $(this).attr('data-src')
+            {% for lang in langs %}
+                 title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')
+                 $('#titleGeneric{{ lang.name }}').val(title{{ lang.name }})
+            {% endfor %}
+            $('#titleGeneric').val(title)
+            $('.result').html('')
+            $('#file-input').val('')
+            $('#typeGeneric').val('word')
+            // $('#actionGeneric').val('edit')
+            $('#actionGeneric').val('edit')
+            $('#idGeneric').val(id)
+            $('#imageResult').attr('src', src )
+            $('#dialog-form').parent().find('.ui-dialog-title').first().html('Update word')
+            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('Update word')
+            // fieldForm(id)
+            dialog.dialog( "open" );
+        });
+
+        $( ".categorieEdit" ).on( "click", function() {
+            id = $(this).attr('data-id')
+            title = $(this).attr('data-title')
+            src = $(this).attr('data-src')
+            {% for lang in langs %}
+                title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')
+                $('#titleGeneric{{ lang.name }}').val(title{{ lang.name }})
+            {% endfor %}
+            $('#imageResult').attr('src', src )
+            $('.result').html('')
+            $('#file-input').val('')
+            $('#titleGeneric').val(title)
+            $('#typeGeneric').val('categorie')
+            $('#actionGeneric').val('edit')
+            $('#idGeneric').val(id)
+            $('#titleGeneric').val(title)
+            $('#dialog-form').parent().find('.ui-dialog-title').first().html('Update categorie')
+            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('Update categorie')
+            // fieldForm(id)
+            dialog.dialog( "open" );
+        });
+
+        $( ".sentenceEdit" ).on( "click", function() {
+            id = $(this).attr('data-id')
+            title = $(this).attr('data-title')
+            src = $(this).attr('data-src')
+            {% for lang in langs %}
+                title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')
+                $('#titleGeneric{{ lang.name }}').val(title{{ lang.name }})
+            {% endfor %}
+            $('#imageResult').attr('src', src )
+            $('#titleGeneric').val(title)
+            $('#typeGeneric').val('categorie')
+            $('#actionGeneric').val('edit')
+            $('.result').html('')
+            $('#file-input').val('')
+            $('#idGeneric').val(id)
+            $('#titleGeneric').val(title)
+            $('#dialog-form').parent().find('.ui-dialog-title').first().html('Update sentence')
+            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('Update sentence')
+            // fieldForm(id)
+            dialog.dialog( "open" );
+        });
+
+
+        $( ".pageEdit" ).on( "click", function() {
+            id = $(this).attr('data-id')
+            title = $(this).attr('data-title')
+            src = $(this).attr('data-src')
+            {% for lang in langs %}
+                {#title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')#}
+                $('#titleGeneric{{ lang.name }}').val('')
+            {% endfor %}
+            $('#imageResult').attr('src', src )
+            $('#typeGeneric').val('page')
+            $('#actionGeneric').val('edit')
+            $('#idGeneric').val(id)
+            $('#titleGeneric').val(title)
+            $('.result').html('')
+            $('#file-input').val('')
+            $('#dialog-form').parent().find('.ui-dialog-title').first().html('Update page')
+            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('Update page')
+            // fieldForm(id)
+            dialog.dialog( "open" );
+        });
+
+        $('.gridManager').on( "click", function() {
+            window.location.href = "/categorieEditor?id=" + $(this).attr('data-id');
+        });
+
+        /* input */
+        // cropper(1);
+// vars
+// }
+
+
+
+        {#$('#titlePage').keyup(function() {#}
+        {#    // console.log('sddfiuhsfuh')#}
+        {#    // console.log( this.value );#}
+        {#    $.ajax({#}
+        {#        method: "POST",#}
+        {#        url: "/pageEditor/update",#}
+        {#        data: { id: {{ page.id }}, title: $('#titlePage').val() }#}
+        {#    })#}
+        {#        .done(function( msg ) {#}
+        {#            // $(document).find('#' + current.id ).parent().remove()#}
+
+        {#        });#}
+        {#});#}
+
+
+        //    reloadResizeImage()
+        $('#tabName').change(function() {
+
+            $.ajax({
+                method: "POST",
+                url: "/categorieEditor/editTitleCat",
+                {#data: { title: this.value, idCat: {{ idCat }} }#}
+            })
+                .done(function( msg ) {
+                    // alert( "Data Saved: " + msg );
+
+                });
+            console.log(this.value)
+        });
+
+
+        $("#btn-form").on("click", function() {
+
+            if ($("#frm-contact").is(":hidden")) {
+                $("#frm-contact").slideDown("slow");
+            } else {
+                $("#frm-contact").slideUp("slow");
+            }
+        });
+
+        // $('.grid-cell').draggable({ revert: true });
+
+        $(".grid-container").sortable({
+            opacity: 0.6,
+            cursor: 'move',
+            items: ".grid-cell:not(.state-disabled)",
+            update: function(event, ui) {
+                var dat = $('#grid-container .grid-cell ')
+                var index = 0
+                var order = []
+                dat.each(function(i) {
+                    order[index] = {'pageOrderId' : $(this).attr('data-id'), 'catId' : $(this).attr('data-catId')}
+                    index++
+                })
+                console.log(order)
+                $.ajax({
+                    method: "POST",
+                    url: "/categorieEditor/updateWordOrder",
+                    data: { 'order' : order }
+                })
+                    .done(function( msg ) {
+                        // alert( "Data Saved: " + msg );
+
+                    });
+
+                // console.log(order)
+            },
+            // cancel: ".ui-state-disabled"
+        });
+
+
+        $( "#slider-range-max-column" ).slider({
+            range: "max",
+            min: 1,
+            max: 10,
+            value: {{ col ?? 2 }},
+            slide: function( event, ui ) {
+                $('#inputSlider-range-max-column').val( ui.value)
+                myFunction_setAjax('--column', ui.value)
+                updateHeader()
+                // $( "#column" ).val( ui.value );
+            }
+        });
+
+        $( "#slider-range-max-row" ).slider({
+            range: "max",
+            min: 1,
+            max: 10,
+            value: {{ row ?? 2 }},
+            slide: function( event, ui ) {
+                $('#inputSlider-range-max-row').val( ui.value)
+                myFunction_setAjax('--row', ui.value)
+                // $( "#column" ).val( ui.value );
+            }
+        });
+
+       var sliderNbTab =  $( "#slider-range-max-nbTabs" ).slider({
+            range: "max",
+            min: 1,
+            max: 24,
+            value: 5,
+            slide: function( event, ui ) {
+                myFunction_set('--nbTabs', ui.value)
+
+                $('#slider-range-max-positionTabs').slider("option", "max",  (ui.value - 1 ));
+
+                // $( "#column" ).val( ui.value );
+            }
+        });
+    console.log(sliderNbTab);
+        $( "#slider-range-max-positionTabs" ).slider({
+            range: "max",
+            min: 0,
+            max: 6,
+            value: 0,
+            slide: function( event, ui ) {
+                // this.val(ui.value)
+                myFunction_set('--tabsPosition', ui.value)
+                // $( "#column" ).val( ui.value );
+            }
+        });
+
+        $('.searchInput').on("keyup", function() {
+          // alert('coucou')
+            var res = $(this).val().toLowerCase()
+            if ( res == '')
+                $('.menuEditor').find('.grid-cell').show();
+            else
+                $('.menuEditor').find('.grid-cell').hide().filter("[filter^='" + res + "']").show();
+        })
+
+        $('.searchInput').on("search", function() {
+            // alert('coucou')
+            var res = $(this).val().toLowerCase()
+            if ( res == '')
+                $('.menuEditor').find('.grid-cell').show();
+            else
+                $('.menuEditor').find('.grid-cell').hide().filter("[filter^='" + res + "']").show();
+        })
+    })
+
+    // $('#tabName').onchange
+
+
+
+function updateHeader() {
+        var nbItem = $('#inputSlider-range-max-column').val() * $('#slider-range-max-column').val()
+
+        console.log(nbItem)
+}
+
+
+    var added = 0
+
+    function addBlockMissing() {
+
+        var nbItem = $('#inputSlider-range-max-column').val() * $('#inputSlider-range-max-row').val()
+        console.log(nbItem)
+        $(document).find( ".page" ).each(function() {
+            var current = $(document).find('.grid-cell').length
+            console.log(current)
+            var news = (nbItem - current)
+            for (let i = 1; i <= news; i++) {
+                addBlock()
+            }
+        });
+
+    }
+
+    function addBlockWord(type, id =null)
+    {
+        if(id == null) {
+
+            var id = $('#wordId').val()
+            if (type == 'sentence')
+                id = $('#sentenceId').val()
+            else if (type == 'categorie')
+                id = $('#categorieId').val()
+        }
+        console.log(id)
+        $.ajax({
+            method: "POST",
+            url: "/categorieEditor/addWord",
+            data: { id: id , idCat: {{ cat.id }},order: $(document).find('.grid-cell').length, type:type }
+        })
+            .done(function( msg ) {
+                // alert( "Data Saved: " + msg );
+                $('.grid-container').append( msg);
+            });
+    }
+
+    function addBlock()
+    {
+        var classes=''
+        if(!$("#drag").is(':checked')) {
+            classes=' state-disabled'
+        }
+
+        $('.grid-container').append( '<div class="grid-cell ' + classes + '" >' +
+            '<button id="catadded'+ added +'" onclick="removeItem(this)" class="notPrint remove"><span class="material-icons">close </span></button>' +
+            '<div class="containerImage">' +
+            // '  <div class="drop-zone "><span class="drop-zone__prompt notPrint">Drop file here or click to upload</span><input id="imgInp'+ added +'"  type="file" name="myFile" class="drop-zone__input'+ added +' notPrint" onchange="preLoadImage(this, '+ added +')" ></div>' +
+
+            // '      <div id="drop-zone" class="drop-zone"> <p  for="imgInp'+ added +'">Drag & drop files here or click to upload</p></div>' +
+                ' <input accept="image/*" type="file" class="btn-upload notPrint" name="imgInp'+ added +'" id="imgInp'+ added +'"  onchange="preLoadImage(this, '+ added +')" />' +
+                '<img id="blah' + added + '" src="#" alt="your image" class="imgPrint zoom" style="display:none;" />' +
+            '</div>' +
+            '<input type="text" class="description" value="">' +
+
+            '</div>' );
+        added++
+
+
+        $(document).find('.drop-zone__input'+ added ).each(function () {
+            inputElement = $(this)
+            console.log('step 1')
+            console.log(inputElement)
+            console.log(this)
+            console.log('step 2')
+
+            // document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
+            const dropZoneElement = inputElement.closest(".drop-zone")[0];
+            console.log(dropZoneElement)
+            dropZoneElement.addEventListener("click", (e) => {
+                inputElement.click();
+            });
+            //
+            // inputElement.addEventListener("change", (e) => {
+            //     if (inputElement.files.length) {
+            //         updateThumbnail(dropZoneElement, inputElement.files[0]);
+            //     }
+            // });
+
+            dropZoneElement.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                dropZoneElement.classList.add("drop-zone--over");
+            });
+
+            ["dragleave", "dragend"].forEach((type) => {
+                dropZoneElement.addEventListener(type, (e) => {
+                    dropZoneElement.classList.remove("drop-zone--over");
+                });
+            });
+
+            dropZoneElement.addEventListener("drop", (e) => {
+                e.preventDefault();
+
+                if (e.dataTransfer.files.length) {
+                    inputElement.files = e.dataTransfer.files;
+                    updateThumbnail(dropZoneElement, e.dataTransfer.files[0]);
+                }
+
+                dropZoneElement.classList.remove("drop-zone--over");
+            });
+        });
+
+    }
+
+    function removeItem(current,id)
+    {
+        console.log(current.id)
+
+        $.ajax({
+            method: "POST",
+            url: "/categorieEditor/delete",
+            data: { id: id }
+        })
+        .done(function( msg ) {
+            $(document).find('#' + current.id ).parent().remove()
+        });
+
+    }
+
+
+
+
+    function preLoadImage(current, index) {
+        console.log(current.id)
+        console.log( $(document).find('#' + current.id ))
+
+        $(document).find('#' + current.id ).hide()
+        $(document).find('#' + current.id ).closest(".containerImage").find('.drop-zone' ).hide()
+        $(document).find('#blah' + index ).show()
+        $(document).find('#blah' + index )[0].src = window.URL.createObjectURL(current.files[0]);
+     //   document.getElementById('"blah' + index +'"' ).src = window.URL.createObjectURL(current.files[0]);
+     //    reloadResizeImage()
+    }
+    //
+    // function reloadResizeImage() {
+    //     console.log('----------------------')
+    //     $(document).find('.containerImage').each(function () {
+    //         const container = this,
+    //             $container = $(this),
+    //             $image = $container.find('img'),
+    //
+    //             factor = 0.1,
+    //             maxScale = 6;
+    //         console.log($image)
+    //         let previousX = 0,
+    //             previousY = 0,
+    //             scale = 1;
+    //         $image.draggable({ scroll: true });
+    //         $container.on('mousedown', function (e) {
+    //             e.preventDefault();
+    //             previousX = e.pageX;
+    //             previousY = e.pageY;
+    //         });
+    //         $container.on('mousemove', function (e) {
+    //             if (e.buttons) {
+    //                 let dragX = 0,
+    //                     dragY = 0;
+    //                 if (e.pageX - previousX !== 0) {
+    //                     dragX = previousX - e.pageX;
+    //                     previousX = e.pageX;
+    //                 }
+    //                 if (e.pageY - previousY !== 0) {
+    //                     dragY = previousY - e.pageY;
+    //                     previousY = e.pageY;
+    //                 }
+    //                 // if (dragX !== 0 || dragY !== 0) {
+    //                 //     container.scrollBy(dragX, dragY);
+    //                 //     console.log(`scrollBy(${dragX}, ${dragY});`);
+    //                 // }
+    //             }
+    //         });
+    //         $container.on('wheel', function (e) {
+    //             e.preventDefault();
+    //             let delta = getDelta(e.originalEvent),
+    //                 mouse = {
+    //                     x: e.pageX - e.target.offsetLeft,
+    //                     y: e.pageY - e.target.offsetTop
+    //                 },
+    //                 offset = {
+    //                     x: container.scrollLeft,
+    //                     y: container.scrollTop
+    //                 },
+    //                 imageLoc = {
+    //                     // x: e.pageX + offset.x,
+    //                     // y: e.pageY + offset.y
+    //                     x: mouse.x + offset.x,
+    //                     y: mouse.y + offset.y
+    //                 },
+    //                 zoomPoint = {
+    //                     x: imageLoc.x / scale,
+    //                     y: imageLoc.y / scale
+    //                 };
+    //             console.log(`delta: ${delta}`);
+    //             scale += delta * factor * scale;
+    //             scale = clamp(scale, 0.1, maxScale);
+    //             let newZoomPoint = {
+    //                 x: zoomPoint.x * scale,
+    //                 y: zoomPoint.y * scale
+    //             };
+    //             let newScroll = {
+    //                 // x: newZoomPoint.x - e.pageX,
+    //                 // y: newZoomPoint.y - e.pageY
+    //                 x: newZoomPoint.x - mouse.x,
+    //                 y: newZoomPoint.y - mouse.y
+    //             };
+    //             console.log(`mouse: ${mouse}`);
+    //             console.log(`Scale: ${scale}`);
+    //             $image.css('transform', `scale(${scale})`);
+    //             container.scrollTop = newScroll.y;
+    //             container.scrollLeft = newScroll.x;
+    //             console.log(`Scroll: ${container.scrollTop}x${container.scrollLeft}`);
+    //         });
+    //     });
+    //
+    //
+    //     function clamp(value, min, max)
+    //     {
+    //         return Math.max(min, Math.min(max, value));
+    //     }
+    //
+    //     function getDelta(event) {
+    //         let delta = event.delta || event.wheelDelta || -event.deltaY;
+    //         if(delta === undefined) {
+    //             delta = event.originalEvent.detail;
+    //         }
+    //         console.log(delta);
+    //         return clamp(delta, -1, 1);
+    //     }
+    //
+    //
+    // }
+
+    var r = document.querySelector(':root');
+
+    // Create a function for getting a variable value
+    function myFunction_get() {
+        // Get the styles (properties and values) for the root
+        var rs = getComputedStyle(r);
+        // Alert the value of the --blue variable
+        // alert("The value of --blue is: " + rs.getPropertyValue('--blue'));
+    }
+
+    // Create a function for setting a variable value
+    function myFunction_set(key,value) {
+        // Set the value of variable --blue to another value (in this case "lightblue")
+        r.style.setProperty(key, value);
+    }
+
+    function myFunction_setAjax(key,value) {
+        // Set the value of variable --blue to another value (in this case "lightblue")
+        r.style.setProperty(key, value);
+
+        $.ajax({
+            method: "POST",
+            url: "/pageEditor/updateValue",
+            data: {id: {{ cat.id }}, key:  key , value: value}
+        })
+            .done(function (msg) {
+                // $(document).find('#' + current.id ).parent().remove()
+
+            });
+    }
+
+function toggleDrag() {
+    $(".grid-container").sortable("destroy");
+
+
+    if($("#drag").is(':checked')) {
+        $(document).find('.grid-cell').removeClass('state-disabled')
+    }else{
+        $(document).find('.grid-cell').addClass('state-disabled')
+    }
+        // $('.grid-cell').toggleClass('state-disabled')
+
+
+    // $(".grid-container").sortable("enable");
+    $(".grid-container").sortable({
+        opacity: 0.6,
+        cursor: 'move',
+        items: ".grid-cell:not(.state-disabled)",
+        update: function(event, ui) {
+            var dat = $('#grid-container .grid-cell ')
+            var index = 0
+            var order = []
+                dat.each(function(i) {
+                    order[index] = {'pageOrderId' : $(this).attr('data-id'), 'catId' : $(this).attr('data-catId')}
+                    index++
+                })
+            console.log(order)
+            $.ajax({
+                method: "POST",
+                url: "/pageEditor/updateCategorieOrder",
+                data: { 'order' : order }
+            })
+                .done(function( msg ) {
+                    // alert( "Data Saved: " + msg );
+
+                });
+
+    console.log(order)
+        },
+        // cancel: ".ui-state-disabled"
+    });
+
+    }
+
+    function openTab(evt, cityName) {
+        // Declare all variables
+        var i, tabcontent, tablinks;
+
+        // Get all elements with class="tabcontent" and hide them
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Show the current tab, and add an "active" class to the link that opened the tab
+        document.getElementById(cityName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+</script>
+<body>
+{% include('/index/menu/menuEdit.html.twig') %}
+
+
+    <div class="menuEditor">
+
+        <div class="tab">
+
+
+            <button class="tablinks" onclick="openTab(event, 'page')">
+                <span class="material-icons">
+                    house
+                </span>
+            </button>
+
+            <button class="tablinks" onclick="openTab(event, 'grid')">
+                <span class="material-icons">
+                    grid_view
+                </span>
+            </button>
+
+{#            <button class="tablinks" onclick="openTab(event, 'tool')">#}
+{#                <span class="material-icons">#}
+{#                    build#}
+{#                </span>#}
+{#            </button>#}
+
+{#            <button class="tablinks" onclick="openTab(event, 'new')">#}
+{#                <span class="material-icons">#}
+{#                    add_box#}
+{#                </span>#}
+{#            </button>#}
+{#            <button class="tablinks" onclick="openTab(event, 'setting')">#}
+{#                <span class="material-icons">#}
+{#                    settings#}
+{#                </span>#}
+{#            </button>#}
+        </div>
+
+        <div id="page" class="tabcontent" style="display: none;">
+                <h2 class="flexFull" >Cat</h2>
+{#            <button class="pageEdit" data-id="{{ page.id }}" data-title="{{ page.title }}" data-src="{{ asset('images/' ~ page.filename) }}">Edit</button>#}
+
+{#            <div id="frm-contact">#}
+{#                <div>#}
+{#                    <h2>Basic</h2>#}
+{#                    #}{#               col <input type="text" id="column" name="column" value="5" >#}
+{#                    #}{#               row <input type="text" id="row" name="row" value="5" onchange="myFunction_set('--row', this.value)">#}
+{#                    background <input type="color" name="background" value="{{ page.background }}" onchange="myFunction_setAjax('--background', this.value)">#}
+{#                    <br>#}
+{#                    Font family#}
+{#                    <select onchange="myFunction_setAjax('--fontFamily', this.value)">#}
+{#                        <option value="arial">Arial</option>#}
+{#                        <option value="Impact, fantasy">Impact, fantasy</option>#}
+{#                        <option value="Chalkduster, fantasy">Chalkduster, fantasy</option>#}
+{#                        <option value=" Verdana">Verdana</option>#}
+{#                        <option value="Comic Sans MS, Comic Sans, cursive">Comic Sans Serif</option>#}
+{#                        <option value="Trebuchet MS">Trebuchet MS</option>#}
+{#                    </select>#}
+
+
+{#                    <br>#}
+{#                    Col#}
+{#                    <div id="slider-range-max-column"></div>#}
+{#                    <input id="inputSlider-range-max-column" value="{{ col }}" style="display: block"/>#}
+{#                    <br>#}
+{#                    Row#}
+{#                    <div id="slider-range-max-row"></div>#}
+{#                    <input id="inputSlider-range-max-row" value="{{ row }}"  style="display: block"/>#}
+{#                    <br>#}
+{#                    Drag and drop <input type="checkbox" id="drag" name="drag" checked onclick="toggleDrag()">#}
+{#                    <br>#}
+{#                </div>#}
+{#                <div >#}
+{#                    <h2>Box</h2>#}
+{#                    background cell <input type="color" name="backgroundCell" value="{{ page.backgroundCell }}" onchange="myFunction_setAjax('--backgroundCell', this.value)">#}
+{#                    <br>#}
+{#                    border <input type="color" name="bordercolor" value="{{ page.border }}" onchange="myFunction_setAjax('--border', this.value)">#}
+{#                    <br>#}
+{#                    Text Color <input type="color" name="descriptioncolor" value="{{ page.colorDescription }}" onchange="myFunction_setAjax('--colorDescription', this.value)">#}
+{#                </div>#}
+{#            </div>#}
+        </div>
+
+        <div id="new" class="tabcontent" style="display: none;">
+
+            <br>
+
+        </div>
+        <div id="grid" class="tabcontent">
+            <br>
+            <a id="tab1-link" class="MenuEditorTabs categorieAdd" >New Categorie</a>
+            <s id="tab1-link" class="MenuEditorTabs wordAdd" >New word</s>
+            <s id="tab1-link" class="MenuEditorTabs sentenceAdd" >New Sentence</s>
+
+
+            <h2 class="flexFull">Grid manager</h2>
+
+            <div class="searchBox">
+                <label class="searchLabelWrap">
+                    <span class="visually-hidden">Search</span>
+                    <svg viewBox="0 0 512 512" aria-hidden="true" class="icon" width="
+        20">
+                        <path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z" />
+                    </svg>
+                    <input type="search" placeholder="Search" class="searchInput" name="s">
+                </label>
+            </div>
+            <div class="grid-container-2x2">
+                {% set addId = 1 %}
+                {% include('/index/part/emptyEdit.html.twig') %}
+
+                <h3 class="flexFull">Categorie</h3>
+                {% for cat in cats %}
+                    {% set addId = cat.id %}
+                    {% set editId = cat.id %}
+                    {% set idCat = cat.id %}
+                    {% include('/index/part/categorieEdit.html.twig') %}
+                {% endfor %}
+                <h3 class="flexFull">Words</h3>
+                {% for word in words %}
+                    {% set addId = word.id %}
+                    {% set editId = word.id %}
+
+                    {% include('/index/part/wordEdit.html.twig') %}
+                {% endfor %}
+                <h3 class="flexFull">Sentence</h3>
+                {% for sentence in sentences %}
+                    {% set addId = sentence.id %}
+                    {% set editId = sentence.id %}
+                    {% include('/index/part/sentenceEdit.html.twig') %}
+                {% endfor %}
+            </div>
+          </div>
+        </div>
+    {% set addId = 0 %}
+
+    <div class="pageEditor">
+        <div id="grid-container"  class="grid-container categories-container">
+        {% for pageOrder in pageOrders|sort((a, b) => a.getOrderDisplay() <=> b.getOrderDisplay()) %}
+            {% if pageOrder.type == 'categorie' %}
+                {% set cat= pageOrder.getUserCategories()  %}
+                {% set deleteId= pageOrder.id  %}
+                {% set editId= pageOrder.id  %}
+                {% include('/index/part/categorieEdit.html.twig') %}
+
+            {% elseif pageOrder.type == 'empty' %}
+                {% set deleteId= pageOrder.id  %}
+    {#            {% set idCat= pageOrder.id  %}#}
+                {% include('/index/part/emptyEdit.html.twig') %}
+            {% elseif pageOrder.type == 'word' %}
+    {#            {% set id = id+1 %}#}
+                {% set word= pageOrder.getWord()  %}
+                {% set deleteId= pageOrder.id  %}
+                {% set editId= word.id  %}
+                {% set idCat= pageOrder.id  %}
+                {% include('/index/part/wordEdit.html.twig') %}
+            {% elseif pageOrder.type == 'action' %}
+                <div class="grid-cell"
+                     data-id="{{ pageOrder.id }}"
+                     onclick='{{ pageOrder.getAction().actionJS }}'
+                >
+                    <div class="containerImage">
+                        <span>{{ pageOrder.getAction().title }}</span>
+                    </div>
+                </div>
+            {% elseif pageOrder.type == 'youtube' %}
+                <div class="grid-cell"
+                     data-id="{{ pageOrder.id }}"
+                     onclick=''
+                >
+                    <div class="containerImage">
+                        <iframe width="100%" height="100%" src="{{ pageOrder.getYoutube().url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+            {% elseif pageOrder.type == 'sentence' %}
+                {% set sentence= pageOrder.getSentence()  %}
+                {% set deleteId= pageOrder.id  %}
+                {% set editId = sentence.id %}
+                {% include('/index/part/sentenceEdit.html.twig') %}
+            {% endif %}
+            {% if loop.index ==  (col * row ) %}
+                <div class="flexFull">
+                    next page
+                </div>
+            {% endif %}
+        {% endfor %}
+
+    </div>
+    </div>
+
+
+    <div id="dialog-form" title="Create new user">
+        <form>
+            <input type="hidden" id="typeGeneric" value="page" />
+            <input type="hidden" id="actionGeneric" value="add" />
+            <input type="hidden" id="idGeneric" value="" />
+            <input type="hidden" id="useridGeneric" value="1" />
+            <div class="searchBox">
+                <label class="searchLabelWrap">
+                    <input type="text" value="" name="titleGeneric" id="titleGeneric">
+                </label>
+            </div>
+
+            <div class="uploader">
+                <div class="box">
+                    <input type="file" id="file-input">
+                </div>
+                <!-- leftbox -->
+                <div class="box-2">
+                    <div class="result"></div>
+                </div>
+                <!--rightbox-->
+                <div class="box-2 img-result ">
+                    <!-- result of crop -->
+                    <img class="cropped" id="imageResult" src="" alt="">
+                </div>
+                <!-- input file -->
+                <div class="box">
+                    <div class="options hide">
+                        <label> Width</label>
+                        <input type="number" class="img-w" value="300" min="100" max="1200" />
+                    </div>
+                    <!-- save btn -->
+                    <button class="btn save hide">Save</button>
+                    <button class="btn clearCropper ">Clear</button>
+                </div>
+            </div>
+            {% for lang in langs %}
+                <div class="searchBox">
+                    {{ lang.name }}
+                    <label class="searchLabelWrap">
+                        <input type="text" value="" name="titleGeneric" id="titleGeneric{{ lang.name }}">
+                    </label>
+                </div>
+            {% endfor %}
+            <input type="hidden" name="userId" value="1">
+        </form>
+    </div>
+
+</body>
+{% endblock %}

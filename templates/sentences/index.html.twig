@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello IndexController!{% endblock %}
+
+{% block body %}
+<script>
+    function selectCombination(ids) {
+        //  $(document).find("#overlay2").css( "display", "block" );
+        console.log(ids)
+
+        var values = {
+            'id': ids,
+           'lang': $("#lang").val(),
+        //    'type': "sentence",
+        };
+        get_text_fixed(values);
+    }
+
+
+    function get_text_fixed(param) {
+        console.log("display")
+        //    $(document).find("#overlay2").css( "display", "block" );
+        var rows = '';
+        $.ajax({
+            url: '/fixed/sentence',
+            type: 'POST',
+            data: JSON.stringify(param),
+            async: false,
+            dataType: 'text'
+        }).done(function (data) {
+            // $("#txt").val(data)
+            console.log(data)
+            try{
+                sendDataToAndroid(data.replace(/\s+/g, ' ').trim())
+            }
+            catch (e) {
+                console.log(e); // Logs the error
+            }
+            try{
+                result = data.split(/[,.?;]/)
+
+                for (const element of result) {
+                    console.log(element);
+                    speak(element);
+                }
+
+            }
+            catch (e) {
+                console.log(e); // Logs the error
+            }
+
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+
+        });
+    }
+</script>
+    <div data-role="tabs" id="tabstest" class="TabsWithTransitionEffect">
+        <div data-role="navbar">
+            <ul class="ul-cards">
+                {% for cat in cats|filter(cat => cat.getSentences() is not empty) %}
+                    <li class='li-card'>
+                        <a href='#tabs-{{ cat.id }}' data-ajax='false' class='licardList ui-link'
+                           style='--bg-img: url({{ asset('images/' ~ cat.icon) }}'>
+                            <div>
+                                <h1>{{ cat.name }}</h1>
+                                <div class='tags'>
+                                    <div class='tag'>{{ cat.name }}</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% for cat in cats|filter(cat => cat.getSentences() is not empty) %}
+                <div id='tabs-{{ cat.id }}'
+                     class='rounded-block slider slider-{{ cat.id }}'>
+                    <div class='owl-carousel owl-theme owl-carousel{{ cat.id }}'>
+                        {% for word in cat.getSentences()|sort((a, b) => a.displayOrder <=> b.displayOrder) %}
+                            {% include '/sentence.html.twig' %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <script>
+                    $(document).ready(function() {
+                        createSlider('owl-carousel{{ cat.id }}');
+                    });
+                </script>
+            {% endfor %}
+
+        </div>
+    </div>
+{% endblock %}

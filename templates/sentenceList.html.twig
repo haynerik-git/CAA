@@ -1,0 +1,6 @@
+<div class="sentence" onclick='selectCombination({{ word.id }})'>
+    <img class="sentence-img" src="{{ asset('images/' ~ word.filename) }}" alt="">
+    <div class="text-overlay">
+        {{ word.getSentenceTranslationsByLang(app.session.get('lang')) }}
+    </div>
+</div>

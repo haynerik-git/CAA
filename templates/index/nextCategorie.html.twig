@@ -1,0 +1,135 @@
+{% block body %}
+
+
+    {{ _self.recursiveCategory1(level,cats) }}
+
+    {% macro recursiveCategory1(id,categories) %}
+        {% if categories|length > 1 %}
+            <div class="container2 tabs{{ id }}" style="background: skyblue;">
+
+                {% for cat in categories|sort((a, b) => a.getDisplayOrder() <=> b.getDisplayOrder()) %}
+                    {% if cat.getWordCategories() is empty %}
+                        <a class="box cell licatList2 home" data-id='{{ cat.id }}' href="#">
+                    {% else %}
+                        <a href="#cat{{ cat.id }}"  data-id='{{ cat.id }}' class="cell">
+                    {% endif %}
+                        <img src="{{ asset('images/' ~ cat.icon) }}" />
+                        <span class="title"> {{ cat.getCategoriesTranslationsByLang(app.session.get('lang')) }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="cols{{ id }}">
+            {% for cat in categories|sort((a, b) => a.getDisplayOrder() <=> b.getDisplayOrder()) %}
+                <div class="displayTabs displayTabs{{ cat.id }} filsterClosest" >
+                    {% if cat.getSentences()|length > 0 %}
+                        <div id="tabBox" style="display:none;">
+                            {% if cat.getSentences()|length > 0 %}
+                                <div data-id="sentence-{{ id }}-{{ cat.id }}" class="tabWrap filter active">
+                                    <label class="tab label-01" for="tab-01"><span>Sentences</span></label>
+                                </div>
+                            {% endif %}
+                            <div  data-id="words-{{ id }}-{{ cat.id }}"  class="tabWrap filter">
+                                <label class="tab label-02 active" for="tab-02"><span>Words</span></label>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="container filterContent words-{{ id }}-{{ cat.id }}"
+                            {% if cat.getSentences()|length != 0 %}
+                                style="display: none;"
+                            {% endif %}
+                    >
+                        {% for word in cat.getWordCategories()|sort((a, b) => a.getDisplayOrder() <=> b.getDisplayOrder()) %}
+                            {% include '/wordsSmall.html.twig' %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="containerSentence2column parent filterContent sentence-{{ id }}-{{ cat.id }}" >
+                        {% for word in cat.getSentences()|sort((a, b) => a.getDisplayOrder() <=> b.getDisplayOrder()) %}
+                            <div class="item">
+                                {% include '/sentenceList.html.twig' %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+{#                    <div class="container containerSentence sentence-{{ id }}-{{ cat.id }}" style="display: none;">#}
+{#                        {% for word in cat.getSentences()|sort((a, b) => a.getDisplayOrder() <=> b.getDisplayOrder()) %}#}
+{#                            {% include '/sentence.html.twig' %}#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+                </div>
+            {% endfor %}
+        </div>
+        {% if categories is empty %}
+            <div class="box fixed" style="background: turquoise">
+                <a href="#" class="menu-item" onclick="speakIa()">
+                    <span class="material-icons">campaign</span>
+                    <span class="menu-item-label">Speak</span>
+                </a>
+                <script>
+                    speakIa();
+                </script>
+            </div>
+        {% endif %}
+        <script>
+            $(document).ready(function() {
+                $(".tabs{{ id }} a").click(function(e) {
+
+                    if($(this).hasClass('active'))
+                        return
+                    $(this).addClass('active');
+                    $(".tabs{{ id }} a").not(this).removeClass('active')
+
+
+                    id = $(this).attr("data-id")
+
+                    // $(".displayTabs").not('.home').not('.filter').fadeOut(100); // Hides all the elements with attribute data-id
+
+                    // $('.displayTabs'+ id ).delay(100).slideToggle(500)
+                    // setTimeout(() => {
+                    //     resizeAllGridItems();
+                    // }, 1000);
+                    $(".displayTabs").not('.home').not('.filter').hide(); // Hides all the elements with attribute data-id
+
+                    $('.displayTabs'+ id ).show()
+                    // setTimeout(() => {
+                        resizeAllGridItems();
+                    // }, 1000);
+
+
+                    //$("div [data-id='" + $(this).attr("href").replace("#","") + "']").delay(100).slideToggle(500); // display the div matching the selected li
+                    e.preventDefault();
+                });
+
+                $(".filter").click(function(e) {
+
+                    if($(this).hasClass('active'))
+                        return
+                    $(this).addClass('active');
+                    $(this).closest( ".filsterClosest" ).find('.filter').not(this).removeClass('active')
+                    $(this).closest( ".filsterClosest" ).find('.filterContent').hide(10);
+
+                   // $(".container").fadeOut(100); // Hides all the elements with attribute data-id
+                    id = $(this).attr("data-id")
+                    $('.'+ id ).fadeIn(500)
+                    //$("div [data-id='" + $(this).attr("href").replace("#","") + "']").delay(100).slideToggle(500); // display the div matching the selected li
+                    e.preventDefault();
+                });
+                //Set the initial state: highlight the first button...
+                $('.tabs{{ id }} a').first().addClass('active');
+                {#$('.cols{{ id }}').find('> div:eq(2)').nextAll().hide();#}
+                $('.displayTabs').hide();
+                $('.displayTabs').first().show();
+                resizeAllGridItems();
+            });
+
+
+        </script>
+        <div id="level{{ id + 1 }}">
+
+        </div>
+    {% endmacro %}
+
+{% endblock %}

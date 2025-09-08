@@ -1,0 +1,106 @@
+{% extends 'baseclean.html.twig' %}
+
+{% block body %}
+    {% include('/index/menu/menuHome.html.twig') %}
+
+
+
+    <div class="grid-container word-container displayTabs" >
+{#        {% set orders = pageOrder.getUserCategories().getUserCategoriesOrders() %}#}
+{#        {% include('/index/order/order.html.twig') %}#}
+        {% for page in pages %}
+            <div class="grid-cell grid-cell-page">
+
+                    <div class="containerImage">
+                        <a href="/page/{{ page.id }}">
+                            <img src="{{ asset('/images/' ~ page.filename) }}">
+                            <span>{{ page.title }}</span>
+                        </a>
+                    </div>
+{#                </a>#}
+                <a  href="/pageEditor?id={{ page.id }}">
+                <button
+                        id="capaget{{ page.id }}" class="notPrint editPage "
+
+{#                        data-id="{{ cat.id }}"#}
+{#                        data-title="{{ cat.label }}"#}
+{#                        data-src="{{ asset('images/' ~ cat.img) }}"#}
+                >
+                     <span class="material-icons">
+                        edit
+                    </span>
+                </button>
+                </a>
+            </div>
+        {% endfor %}
+        <div id="pagination-container">
+            <div></div>
+        </div>
+        <script>
+
+            $('body').on('contextmenu', '.containerImage', function(e){
+                console.log($(e.target))
+                let target;
+                if($(e.target).hasClass('image-checkbox')){
+                    // The target element is not a .tiny div
+                    target =  $(e.target)
+                }
+                else {
+                    // find closest
+                    var href = $(e.target).closest( "a" ).attr('href')
+                    window.location.href = href;
+                }
+                return false
+            });
+
+
+
+            $(document).ready(function() {
+                var items = $(".displayTabs .grid-cell");
+                var numItems = items.length;
+                var perPage = 6;
+                items.slice(perPage).hide();
+
+                $('#pagination-container').pagination({
+                    items: numItems,
+                    itemsOnPage: perPage,
+                    displayedPages: 0,
+                    edges: 0,
+                    // prevText: "&laquo;",
+                    // nextText: "&raquo;",
+                    onPageClick: function (pageNumber) {
+                        var showFrom = perPage * (pageNumber - 1);
+                        var showTo = showFrom + perPage;
+                        items.hide().slice(showFrom, showTo).show();
+                    }
+                });
+            })
+        </script>
+    </div>
+
+    <style>
+
+        :root {
+            --column:3;
+            --row: 2;
+            --background: #c3c3c3;
+            --backgroundCell: white;
+            --backgroundTab: #000;
+            --border:none;
+            --colorDescription: black;
+            --tabsPosition:0;
+            --nbTabs: 7;
+            --colorTextTab: #fff;
+            --headerHeight:1.2cm;
+            --margeTop: 1.5cm;
+            {#--fontFamily:{{ page.font }};#}
+            --size: clamp(250px, 50vmin);
+            @media screen and (max-width: 640px) {
+                /*--column: 4;*/
+                /*--row: 4;*/
+            }
+        }
+
+
+    </style>
+{% endblock %}

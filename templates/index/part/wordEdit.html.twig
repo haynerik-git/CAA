@@ -1,0 +1,74 @@
+{% set sizeCellClass = '' %}
+{% if pageOrder is defined and pageOrder.sizeCell is defined and pageOrder.sizeCell is not null %}
+    {% set sizeCellClass = 'grid-cell-'  ~  pageOrder.sizeCell %}
+{% endif %}
+<div class="grid-cell
+{{ sizeCellClass }}"
+    {% if deleteId is defined %}
+        data-id="{{ deleteId }}"
+    {% endif %}
+    {% if idCat is defined %}
+        data-catId="{{ idCat }}"
+    {% endif %}
+        filter="{{ word.getWordTranslationsByLang(app.session.get('lang'))|lower  }}"
+
+        >
+    {% if deleteId is defined %}
+            <button id="catDelete{{ deleteId }}" class="notPrint remove"
+                    onclick="removeItem(this,{{ deleteId }}, 'word')"
+            >
+                 <span class="material-icons">
+                    close
+                </span>
+            </button>
+    {% endif %}
+    {% if editId is defined %}
+        <button id="word{{ editId }}" class="notPrint edit wordEdit"
+                data-id="{{ editId }}"
+                data-title="{{ word.name() }}"
+                data-src="{{ asset('images/' ~ word.filename) }}"
+                {% for lang in langs %}
+                    data-title{{ lang.name }}="{{ word.getWordTranslationsByLang(lang.id) }}"
+                {% endfor %}
+        >
+
+                     <span class="material-icons">
+                        edit
+                    </span>
+        </button>
+    {% endif %}
+    {% if addId is defined and addId != 0 %}
+        <button id="catAdd{{ addId }}" class="notPrint add"
+                onclick="addBlockWord( 'word' , {{ addId }})"
+        >
+                 <span class="material-icons">
+                    add
+                </span>
+        </button>
+    {% endif %}
+    {% if hidden is defined %}
+        <button id="wordHide{{ hiddenId }}" class="notPrint visible
+                    {% if hidden %}
+                        visibility
+                     {% else %}
+                        visibility_off
+                     {% endif %}
+                     "
+                onclick="hideItem(this,{{ hiddenId }})"
+        >
+                 <span class="material-icons visibility_icon
+                        visibility
+                ">
+                        visibility
+                </span>
+                <span class="material-icons visibility_off_icon">
+                         visibility_off
+                </span>
+        </button>
+    {% endif %}
+    <div class="containerImage">
+        <img class="imgPrint zoom"  src="{{ asset('images/' ~ word.filename) }}" alt="{{ word.name }}" >
+        <span>{{ word.getWordTranslationsByLang(app.session.get('lang')) }}</span>
+    </div>
+{#    <input type="text" class="description" value="{{ word.getWordTranslationsByLang(app.session.get('lang'))  }}"></input>#}
+</div>

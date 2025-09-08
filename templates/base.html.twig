@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="stylesheet" href="http://198.251.76.181/js/_assets/css/themes/default/jquery.mobile-1.4.5.min.css">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+{#        <script src="http://198.251.76.181/js/_assets/js/jquery.js"></script>#}
+        <!--    <script src="/js/_assets/js/index.js"></script>-->
+{#        <script src="http://198.251.76.181/js/owl.carousel.min.js"></script>#}
+{#        <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.2.1/owl.carousel.min.js"></script>#}
+
+
+{#        <script src="https://cdnjs.cloudflare.com/ajax/libs/flickity/2.2.1/flickity.pkgd.min.js"></script>#}
+{#        <script src="http://198.251.76.181/js/stopExecutionOnTimeout.js"></script>#}
+{#        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">#}
+{#        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">#}
+{#        <script src="https://huynhhuynh.github.io/owlcarousel2-filter/dist/owlcarousel2-filter.min.js"></script>#}
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+
+        <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+
+
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script src="http://198.251.76.181/js/_assets/js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.8/slick.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+
+
+
+        {% block stylesheets %}
+        {% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+    <script>
+        (function( $ ) {
+            $.fn.slickFilterable = function( options ) {
+
+                /**
+                 * A plugin to create a slick we can filter.
+                 *
+                 * If you are not using Rows you can use slickFilter
+                 * (check documentation) otherwise we can provide a valid filter.
+                 *
+                 * options {
+                 *      slideSelector    string     jQuery selector to get slides. Imetiate children by default.
+                 *      filterName       string     We will search for data-{filterName} clickable elements.
+                 *      slick            object     The slick settings. Check Slick doc.
+                 *      beforeFilter     function   A fuction called before filter slider. Receives the trigger element
+                 *                                  as this and 3 params: category (string), slider and slides (jQuery objects).
+                 *      filter           mix        A valid parameter to jQuery filter() function. If it's a functio we will wrap
+                 *                                  it and it receives the trigger element as this and 3 params: category (string),
+                 *                                  slider (jQuery object) and a copy of settings (extended).
+                 * }
+                 */
+                var settings = $.extend({
+                    slideSelector: '> *',
+                    filterName: 'filter-slick',
+                    slick: {},
+                    beforeFilter: function() {},
+                    filter: function( element, category, slider, settings ) { return true; },
+                }, options );
+
+                return this.each(function() {
+                    var slider = $(this),
+                        slides = slider.find( settings.slideSelector ),
+                        slickObj;
+
+                    /**
+                     * Create Slick
+                     *
+                     * TIP: you should you 'slidesPerRow' instead 'slidesToShow' in grid mode (with rows)
+                     * to avoid slick break layout when there are less slides than on "page".
+                     */
+                    slickObj = slider.slick( settings.slick );
+
+                    // Handle Filter Click
+                    $('[data-' + settings.filterName + ']').on('click', function(event) {
+                        event.preventDefault();
+
+                        var category = $(this).attr('data-'+settings.filterName),
+                            newSlides = $.extend(true, {}, slides),
+                            newSlickOptions;
+
+                        if ( ! category ) return;
+
+                        // Before Filter Slides
+                        if ( typeof settings.beforeFilter == 'function' ) {
+                            settings.beforeFilter.call(this, category, slider, slides);
+                        }
+
+                        // Destroy and empty
+                        slider.slick('unslick');
+
+                        // Recreate All Slides
+                        if ( category === 'all' ) {
+                            slider.find( settings.slideSelector ).remove();
+                            slider.append( newSlides );
+                            slider.slick( settings.slick );
+
+                            return;
+                        }
+
+                        /**
+                         * Filter Slides
+                         *
+                         * If settings.filter is a function we pass the category, slider and a copy of settings
+                         * expecting a true or false return to pass it to jQuery.filter();
+                         *
+                         * If not, we just pass it directly.
+                         */
+                        if ( typeof settings.filter !== 'function' ) {
+                            newSlides = newSlides.filter( settings.filter );
+                        } else {
+                            newSlides = newSlides.filter( function() {
+                                return settings.filter.call( this, category, slider, $.extend( true, {}, settings ) );
+                            } );
+                        }
+
+                        slider.find( settings.slideSelector ).remove();
+                        slider.append( newSlides );
+                        slider.slick( settings.slick );
+                    });
+                });
+            };
+        }(jQuery));
+        var userLang = navigator.language || navigator.userLanguage;
+        // alert ("The language is: " + userLang);
+
+        // jQuery(function () {
+        //     jQuery('base').remove();
+        //     // jQuery("#tabs").tabs();
+        // });
+        //
+        // $(document).on('pageinit', function () {
+        //
+        //     console.log('pageinit');
+        //     // $("#tabstrip").data("kendoTabStrip").one("contentLoad", function(e) {
+        //     //     e.sender.select(0);
+        //     // })
+        //
+        //     /*
+        //     * Ensure the correct tab of a set is selected (and only once)
+        //     * https://stackoverflow.com/questions/25336233/jquery-mobile-default-tab/64080164#64080164
+        //     */
+        //     $(document).find('[data-role="tabs"] [data-role="navbar"] ul li.select-this-tab').each(function () {
+        //         console.log('Clicking tab');
+        //         $(this).removeClass("select-this-tab").find("a").click();
+        //     });
+        //
+        //     /*
+        //      * Ensure a tab REMAINS selected when coming back to that page.
+        //      * https://stackoverflow.com/questions/16752704/tab-active-state-in-jquery-mobile/23725612#23725612
+        //      */
+        //     $(document).find('div[data-role="tabs"] [data-role="navbar"] a').click(function (e) {
+        //         e.preventDefault();
+        //         $('div[data-role="tabs"] [data-role="navbar"] .ui-btn-active').removeClass('ui-btn-active ui-state-persist');
+        //         $(this).addClass('ui-btn-active ui-state-persist');
+        //
+        //         alert(';a;a;a;a')
+        //
+        //     });
+        // });
+        $(document).on("click", ".licatList2", function() {
+
+            $.ajax({
+                url: '/listWordsCat/' + $(this).attr('data-id'),
+                type: 'POST',
+                // data: JSON.stringify(param),
+                async: false,
+                dataType: 'html',
+                cache: true
+            }).done(function (data) {
+                rows = data;
+                $("#level2").html(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                rows = '';
+            });
+
+        });
+
+        $(document).on("click", ".licatList", function() {
+
+            $.ajax({
+                url: '/wordsCatId/' + $(this).attr('data-id'),
+                type: 'POST',
+                // data: JSON.stringify(param),
+                async: false,
+                dataType: 'html',
+                cache: true
+            }).done(function (data) {
+                rows = data;
+                $("#level2").html(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                rows = '';
+            });
+
+            // alert($(this).data('slider')); //THIS WORKS!
+            setTimeout(() => {
+                createSlider($(this).data('slider'), 3);
+            }, "250")
+            // alert('slider')
+        });
+
+        $(document).on("click", ".licardList1", function() {
+
+            // alert($(this).data('slider')); //THIS WORKS!
+            setTimeout(() => {
+                createSlider($(this).data('slider'), 3);
+            }, "250")
+            // alert('slider')
+        });
+
+
+        $(document).on("click", ".tabCarroussel", function() {
+
+            // alert($(this).data('slider')); //THIS WORKS!
+            setTimeout(() => {
+                createSlider($(this).data('slider'), 3);
+            }, "250")
+            // alert('slider')
+        });
+
+        ///*****************   WORD *****************/////
+        let selectedWord = [];
+        let selectedCategories = [];
+
+        function actionCategorie(id, description, level= 1, type = "categorie") {
+            // selectedCategories = toggleValueInArray(selectedCategories, id)
+            var lastWord=null;
+            var lastCategorie=id;
+            if (type == "word") {
+                selectedWord = toggleValueInArray(selectedWord, id)
+                lastWord = id;
+            }
+            else {
+                selectedCategories = toggleValueInArray(selectedCategories, id)
+                lastCategorie = id;
+            }
+
+
+            // speak(description)
+            var param = {
+                lastWord: lastWord,
+                lastCategorie:lastCategorie,
+                word : selectedWord,
+                categorie : selectedCategories,
+                level : level + 1
+            }
+            $.ajax({
+                url: '/nextCategorie',
+                type: 'POST',
+                data: JSON.stringify(param),
+                async: true,
+                dataType: 'html',
+                cache: true
+            }).done(function (data) {
+                rows = data;
+                console.log((level + 1))
+                $("#level" + (level + 1) ).html(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                rows = '';
+            });
+        }
+
+        function actionWord(id, description, categorieId = 0,level= 1, type = "word") {
+            var lastWord=id;
+            var lastCategorie=categorieId;
+            if (type == "word") {
+                selectedWord = toggleValueInArray(selectedWord, id)
+                lastWord = id;
+            }
+            else {
+                selectedCategories = toggleValueInArray(selectedCategories, id)
+                lastCategorie = id;
+            }
+
+            $("#listWord").html(JSON.stringify(selectedWord))
+
+            if( $('#speakOnClick').is(':checked') ) {
+                speak(description)
+            }
+
+            var param = {
+                lastWord: lastWord,
+                lastCategorie:lastCategorie,
+                word : selectedWord,
+                categorie : selectedCategories,
+                level : level + 1
+            }
+
+            $.ajax({
+                url: '/listWord',
+                type: 'POST',
+                data: JSON.stringify(param),
+                async: false,
+                dataType: 'html'
+            }).done(function (data) {
+                rows = data;
+                $("#listWord").html(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                rows = '';
+            });
+
+            $.ajax({
+                url: '/nextCategorie',
+                type: 'POST',
+                data: JSON.stringify(param),
+                async: false,
+                dataType: 'html',
+                cache: true
+            }).done(function (data) {
+                rows = data;
+                $("#level" + (level + 1) ).html(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                rows = '';
+            });
+
+
+        }
+
+        function toggleValueInArray(array, value) {
+            var index = array.indexOf(value);
+            if (index === -1) {
+                array.push(value);
+            } else {
+                array.splice(index, 1);
+            }
+            console.log(array)
+            return array
+        }
+
+
+        ///*****************  Fin WORD *****************/////
+        function createFilter(classe, template , item = 0) {
+
+
+           // template.trigger('destroy.owl.carousel');
+            var posts = $('#filterWords' + classe+' .post');
+            console.log('ici')
+            // $('#filterWords' + classe + " a").click(function () {
+//             $( '.owl-filter-bar' ).on( 'click', '.item', function() {
+//                 console.log('tada')
+//                 var $item = $(this);
+//                 var filter = $item.data( 'owl-filter' )
+// console.log(filter)
+//                 template.owlcarousel2_filter( filter );
+// console.log('finis')
+//                 // posts.hide();
+//                 // // Get data of category
+//                 // var customType = $(this).data('filter'); // category
+//                 // console.log(customType)
+//                 // $('#filterWords' + classe + ' .post').each(function () {
+//                 //     // Get data of item
+//                 //     console.log($(this))
+//                 //     let data = $(this).attr('cat')
+//                 //     console.log(data)
+//                 //
+//                 //     // If equal = show
+//                 //     if (data.indexOf(customType) !== -1) {
+//                 //         $(this).show()
+//                 //     }
+//                 // });
+//                 // setTimeout(() => {
+//                 //     createSlider('owl-carouselWords'+classe);
+//                 // }, "1000");
+//
+//             });
+
+        }
+        function createSlider(classe, template = 1, item = 0) {
+            //
+            // $('.'+classe).slick({
+            //     slidesToShow: 2,
+            //     dots:true,
+            //     centerMode: true,
+            //     rows:2
+            // });
+console.log(classe)
+console.log($('.'+classe))
+            $(document).find("."+classe)
+            $('.'+classe).not('.slick-initialized').slickFilterable({
+                filterName: 'filter-slide-'+classe,
+                filter: function( category, slider, settings ) {
+                    console.log(category)
+                    return $(this).hasClass( category );
+                },
+                slick: {
+                    dots: false,
+                    infinite: true,
+                    speed: 50,
+                    centerMode: false,
+                    swipeToSlide:true,
+                    // rows:template,
+                    rows:2,
+                    mobileFirst:true,
+                    arrows: false,
+                    slidesToShow: 3,
+                    slidesToScroll: 3,
+                    // variableWidth: true,
+                    centerPadding: '60px',
+                    edgeFriction:100,
+                    responsive: [
+                        {
+                            breakpoint: 2048,
+                            settings: {
+                                slidesToShow: 8,
+
+                                infinite: false,
+                                dots: false
+                            }
+                        },
+                        {
+                            breakpoint: 1024,
+                            settings: {
+                                slidesToShow: 5,
+                                infinite: false,
+                                dots: false
+                            }
+                        },
+                        {
+                            breakpoint: 600,
+                            settings: {
+                                slidesToShow: 4,
+                                // slidesToScroll: 1
+                            }
+                        },
+                        {
+                            breakpoint: 480,
+                            settings: {
+                                slidesToShow: 3,
+                                // slidesToScroll: 1,
+                                // rows: 2
+                            }
+                        },
+                        {
+                            breakpoint: 280,
+                            settings: {
+                                slidesToShow: 2,
+                                // slidesToScroll: 1,
+                                // rows: 2
+                            }
+                        }
+                        //
+                        // You can unslick at a given breakpoint now by adding:
+                        // settings: "unslick"
+                        // instead of a settings object
+                    ]
+                }
+            });
+            //
+            // $('.'+classe).slick({
+            //     dots: false,
+            //     infinite: false,
+            //     speed: 300,
+            //     centerMode: false,
+            //     swipeToSlide:true,
+            //     rows:template,
+            //     mobileFirst:true,
+            //     arrows: false,
+            //     slidesToShow: 3,
+            //     slidesToScroll: 1,
+            //    // variableWidth: true,
+            //     responsive: [
+            //         {
+            //             breakpoint: 2048,
+            //             settings: {
+            //                 slidesToShow: 8,
+            //
+            //                 infinite: false,
+            //                 dots: false
+            //             }
+            //         },
+            //         {
+            //             breakpoint: 1024,
+            //             settings: {
+            //                 slidesToShow: 5,
+            //                 infinite: false,
+            //                 dots: false
+            //             }
+            //         },
+            //         // {
+            //         //     breakpoint: 600,
+            //         //     settings: {
+            //         //         slidesToShow: 5,
+            //         //         slidesToScroll: 1
+            //         //     }
+            //         // },
+            //         // {
+            //         //     breakpoint: 480,
+            //         //     settings: {
+            //         //         slidesToShow: 5,
+            //         //         slidesToScroll: 1,
+            //         //         rows: 2
+            //         //     }
+            //         // },
+            //         // {
+            //         //     breakpoint: 280,
+            //         //     settings: {
+            //         //         slidesToShow: 3,
+            //         //         slidesToScroll: 1,
+            //         //         rows: 2
+            //         //     }
+            //         // }
+            //         //
+            //         // You can unslick at a given breakpoint now by adding:
+            //         // settings: "unslick"
+            //         // instead of a settings object
+            //     ]
+            // });
+        }
+
+        function createSliderSentences(classe, template = 1, item = 0) {
+            //
+            // $('.'+classe).slick({
+            //     slidesToShow: 2,
+            //     dots:true,
+            //     centerMode: true,
+            //     rows:2
+            // });
+            console.log(classe)
+
+            return $('.'+classe).slick({
+                dots: false,
+                infinite: false,
+                speed: 300,
+                centerMode: false,
+                swipeToSlide:true,
+                rows:template,
+                mobileFirst:true,
+                arrows: false,
+                responsive: [
+                    {
+                        breakpoint: 2048,
+                        settings: {
+                            slidesToShow: 8,
+                            slidesToScroll: 3,
+                            infinite: true,
+                            dots: false
+                        }
+                    },
+                    {
+                        breakpoint: 1024,
+                        settings: {
+                            slidesToShow: 8,
+                            slidesToScroll: 3,
+                            infinite: true,
+                            dots: false
+                        }
+                    },
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            slidesToShow: 5,
+                            slidesToScroll: 5
+                        }
+                    },
+                    {
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 6,
+                            slidesToScroll: 1,
+                            rows: 1
+                        }
+                    },
+                    {
+                        breakpoint: 280,
+                        settings: {
+                            slidesToShow: 5,
+                            slidesToScroll: 1,
+                            rows: 1
+                        }
+                    }
+                    // You can unslick at a given breakpoint now by adding:
+                    // settings: "unslick"
+                    // instead of a settings object
+                ]
+            });
+        }
+
+        /****************** multiline carroussel *********/
+        function createSliderOwl(classe, template = 1, item = 0) {
+            var el = $('.'+classe);
+
+            var carousel;
+            if (template == 1 ) {
+                var carouselOptions = {
+                    margin: 20,
+                    nav: false,
+                    dots: false,
+                    slideBy: 'page',
+                    responsive: {
+                        0: {
+                            items: 3,
+                            rows: 3 //custom option not used by Owl Carousel, but used by the algorithm below
+                        },
+                        500: {
+                            items: 4,
+                            rows: 4 //custom option not used by Owl Carousel, but used by the algorithm below
+                        },
+                        768: {
+                            items: 6,
+                            rows: 4 //custom option not used by Owl Carousel, but used by the algorithm below
+                        },
+                        991: {
+                            items: 8,
+                            rows: 4 //custom option not used by Owl Carousel, but used by the algorithm below
+                        },
+                        1200: {
+                            items: 9,
+                            rows: 4 //custom option not used by Owl Carousel, but used by the algorithm below
+                        }
+                    }
+                };
+            }
+            else {
+                var carouselOptions = {
+                    margin: 20,
+                    nav: false,
+                    dots: false,
+                    slideBy: 'page',
+                    startPosition: (item - 1),
+                    responsive: {
+                        0: {
+                            items: 3,
+                            rows: 1, //custom option not used by Owl Carousel, but used by the algorithm below
+                            startPosition: (item - 1),
+                        },
+                        500: {
+                            items: 4,
+                            rows: 1, //custom option not used by Owl Carousel, but used by the algorithm below
+                            startPosition: (item - 1),
+                        },
+                        768: {
+                            items: 5,
+                            rows: 1, //custom option not used by Owl Carousel, but used by the algorithm below
+                            startPosition: (item - 1),
+                        },
+                        991: {
+                            items: 6,
+                            rows: 1, //custom option not used by Owl Carousel, but used by the algorithm below
+                            startPosition: (item - 1),
+                        },
+                        1200: {
+                            items: 8,
+                            rows: 1, //custom option not used by Owl Carousel, but used by the algorithm below
+                            startPosition: (item - 1),
+                        }
+                    }
+                };
+            }
+
+
+            //Taken from Owl Carousel so we calculate width the same way
+            var viewport = function () {
+                var width;
+                if (carouselOptions.responsiveBaseElement && carouselOptions.responsiveBaseElement !== window) {
+                    width = $(carouselOptions.responsiveBaseElement).width();
+                } else if (window.innerWidth) {
+                    width = window.innerWidth;
+                } else if (document.documentElement && document.documentElement.clientWidth) {
+                    width = document.documentElement.clientWidth;
+                } else {
+                    console.warn('Can not detect viewport width.');
+                }
+                return width;
+            };
+
+            var severalRows = false;
+            var orderedBreakpoints = [];
+            for (var breakpoint in carouselOptions.responsive) {
+                if (carouselOptions.responsive[breakpoint].rows > 1) {
+                    severalRows = true;
+                }
+                orderedBreakpoints.push(parseInt(breakpoint));
+            }
+
+            //Custom logic is active if carousel is set up to have more than one row for some given window width
+            if (severalRows) {
+                orderedBreakpoints.sort(function (a, b) {
+                    return b - a;
+                });
+                var slides = el.find('[data-slide-index]');
+                var slidesNb = slides.length;
+                if (slidesNb > 0) {
+                    var rowsNb;
+                    var previousRowsNb = undefined;
+                    var colsNb;
+                    var previousColsNb = undefined;
+
+                    //Calculates number of rows and cols based on current window width
+                    var updateRowsColsNb = function () {
+                        var width = viewport();
+                        for (var i = 0; i < orderedBreakpoints.length; i++) {
+                            var breakpoint = orderedBreakpoints[i];
+                            if (width >= breakpoint || i == (orderedBreakpoints.length - 1)) {
+                                var breakpointSettings = carouselOptions.responsive['' + breakpoint];
+                                rowsNb = breakpointSettings.rows;
+                                colsNb = breakpointSettings.items;
+                                break;
+                            }
+                        }
+                    };
+
+                    var updateCarousel = function () {
+                        updateRowsColsNb();
+
+                        //Carousel is recalculated if and only if a change in number of columns/rows is requested
+                        if (rowsNb != previousRowsNb || colsNb != previousColsNb) {
+                            var reInit = false;
+                            if (carousel) {
+                                //Destroy existing carousel if any, and set html markup back to its initial state
+                                carousel.trigger('destroy.owl.carousel');
+                                carousel = undefined;
+                                slides = el.find('[data-slide-index]').detach().appendTo(el);
+                                el.find('.fake-col-wrapper').remove();
+                                reInit = true;
+                            }
+
+
+                            //This is the only real 'smart' part of the algorithm
+
+                            //First calculate the number of needed columns for the whole carousel
+                            var perPage = rowsNb * colsNb;
+                            var pageIndex = Math.floor(slidesNb / perPage);
+                            var fakeColsNb = pageIndex * colsNb + (slidesNb >= (pageIndex * perPage + colsNb) ? colsNb : (slidesNb % colsNb));
+
+                            //Then populate with needed html markup
+                            var count = 0;
+                            for (var i = 0; i < fakeColsNb; i++) {
+                                //For each column, create a new wrapper div
+                                var fakeCol = $('<div class="fake-col-wrapper"></div>').appendTo(el);
+                                for (var j = 0; j < rowsNb; j++) {
+                                    //For each row in said column, calculate which slide should be present
+                                    var index = Math.floor(count / perPage) * perPage + (i % colsNb) + j * colsNb;
+                                    if (index < slidesNb) {
+                                        //If said slide exists, move it under wrapper div
+                                        slides.filter('[data-slide-index=' + index + ']').detach().appendTo(fakeCol);
+                                    }
+                                    count++;
+                                }
+                            }
+                            //end of 'smart' part
+
+                            previousRowsNb = rowsNb;
+                            previousColsNb = colsNb;
+
+                            if (reInit) {
+                                //re-init carousel with new markup
+                                carousel = el.owlCarousel(carouselOptions);
+                            }
+                        }
+                    };
+
+                    //Trigger possible update when window size changes
+                     $(window).on('resize', updateCarousel);
+
+                    //We need to execute the algorithm once before first init in any case
+                    updateCarousel();
+                }
+            }
+
+            //init
+            carousel = el.owlCarousel(carouselOptions);
+            return carousel;
+        }
+
+
+        /****************** END multiline carroussel *********/
+
+
+
+        ///********************* SPEAKER *************************///
+
+        const synth = window.speechSynthesis;
+        const queue = [];
+        const inputForm = document.querySelector("form");
+        const inputTxt = document.querySelector(".txt");
+        // const voiceSelect = document.querySelector(".googleLang");
+
+        const pitch = document.querySelector("#pitch");
+        const pitchValue = document.querySelector(".pitch-value");
+        const rate = document.querySelector("#rate");
+        const rateValue = document.querySelector(".rate-value");
+
+        let voices = [];
+
+        function populateVoiceList() {
+            voices = synth.getVoices().sort(function (a, b) {
+                const aname = a.name.toUpperCase();
+                const bname = b.name.toUpperCase();
+
+                if (aname < bname) {
+                    return -1;
+                } else if (aname == bname) {
+                    return 0;
+                } else {
+                    return +1;
+                }
+            });
+        }
+
+        populateVoiceList();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
+        function reset(  ) {
+            $("#listWord").html("");
+            selectedWord = [];
+            selectedCategories = [];
+            $(".ribbon").css("display","none")
+        }
+
+        function speakIa() {
+            console.log("display")
+            //    $(document).find("#overlay2").css( "display", "block" );
+            var rows = '';
+            var inputTxt =  $(document).find("#txt").val();
+            var param = { text: inputTxt };
+            $.ajax({
+                url: '/speaker/contactIaRework',
+                type: 'POST',
+                data: param,
+                async: false,
+                dataType: 'text'
+            }).done(function (data) {
+                // $("#txt").val(data)
+                try{
+                    sendDataToAndroid(data.replace(/\s+/g, ' ').trim())
+                }
+                catch (e) {
+                    console.log(e); // Logs the error
+                }
+
+
+                try{
+                    speak(data);
+                }
+                catch (e) {
+                    console.log(e); // Logs the error
+                }
+             //   reset();
+                rows = data;
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                rows = '';
+            });
+            return rows;
+        }
+
+
+        function speak( inputTxt = null ) {
+            // if (synth.speaking) {
+            //     alert("pas la")
+            //     console.error("speechSynthesis.speaking");
+            //     return;
+            // }
+            if (inputTxt == null )
+                inputTxt =  $(document).find("#txt").val();
+
+            if (inputTxt !== "") {
+                const utterThis = new SpeechSynthesisUtterance(inputTxt);
+
+                utterThis.onend = function (event) {
+                    console.log("SpeechSynthesisUtterance.onend");
+                    $(document).find("#overlay2").css( "display", "none" );
+                    queue.shift();
+                    // S'il reste des énoncés dans la file d'attente, lire le suivant
+                    if (queue.length > 0) {
+                        synth.speak(queue[0]);
+                    }
+
+                };
+
+                utterThis.onerror = function (event) {
+                    alert("error")
+                    console.error("SpeechSynthesisUtterance.onerror");
+                };
+
+                // Debug
+                //
+                // const selectedOption =
+                //     voiceSelect.selectedOptions[0].getAttribute("data-name");
+                //
+                // for (let i = 0; i < voices.length; i++) {
+                //     if (voices[i].name === selectedOption) {
+                //         utterThis.voice = voices[i];
+                //         break;
+                //     }
+                // }
+
+     /*
+              Not wrks well
+
+              let voice =  voices[0];
+
+                if($("#lang").val() == 1)
+                    voice = speechSynthesis.getVoices().filter(function(voice) {
+                        return voice.lang == 'fr-FR';
+                    })[0];
+                    // utterThis.voice = voices.filter(voice => voice.lang == 'fr-FR');
+
+                if($("#lang").val() == 4 || $("#lang").val() == 2)
+                    voice = speechSynthesis.getVoices().filter(function(voice) {
+                        return voice.lang == 'es-ES';
+                    })[0];
+
+                if($("#lang").val() == 3)
+                    utterThis.voice = voices[9];
+
+                if($("#lang").val() == 5)
+                    utterThis.voice = voices[1];
+                //force FR voice
+                //
+
+                utterThis.voice = voice;
+      */
+                utterThis.rate = 1;
+
+                utterThis.pitch = 1;
+                if( $('#robotVoice').is(':checked') ){
+                    utterThis.pitch = 0.01;
+                }
+
+                //synth.speak(utterThis);
+
+                queue.push(utterThis);
+                console.log(queue)
+                if (synth.speaking === false) {
+                    synth.speak(utterThis);
+                }
+            }
+        }
+
+        // Creer un objet de sintetisation vocale
+   //     const synth = window.speechSynthesis;
+        // Creer une file d'attente pour les énoncés
+     //   const queue = [];
+        // Fonction pour ajouter un énoncé a la file d'attente
+        // const enqueue = (text) => {
+        //     const utterance = new SpeechSynthesisUtterance(text);
+        //     queue.push(utterance);
+        //     if (synth.speaking === false) {
+        //         synth.speak(utterance);
+        //     }
+        // };
+        //
+        // // Gestionnaire d'evenements pour la fin de l'énoncé
+        // synth.onend = () => {
+        //     // Enlever l'énoncé de la file d'attente
+        //     queue.shift();
+        //     // S'il reste des énoncés dans la file d'attente, lire le suivant
+        //     if (queue.length > 0) {
+        //         synth.speak(queue[0]);
+        //     }
+        //
+        // };
+        ///********************* END SPEAKER *************************///
+
+
+
+        ///********************* Start lang *************************///
+        function setLang(item)
+        {
+            var param = {
+                lang: item.value,
+            }
+                       $.ajax({
+                           url: '/setLang',
+                           type: 'POST',
+                           data: JSON.stringify(param),
+                           async: false,
+                           dataType: 'html'
+                       }).done(function (data) {
+                           location.reload();
+                       }).fail(function (jqXHR, textStatus, errorThrown) {
+                           rows = '';
+                       });
+        }
+        ///********************* End lang *************************///
+
+
+
+        function selectCombination(ids) {
+            //  $(document).find("#overlay2").css( "display", "block" );
+            console.log(ids)
+
+            var values = {
+                'id': ids,
+                'lang': $("#lang").val(),
+                //    'type': "sentence",
+            };
+            get_text_fixed(values);
+        }
+
+
+        function get_text_fixed(param) {
+            console.log("display")
+            //    $(document).find("#overlay2").css( "display", "block" );
+            var rows = '';
+            $.ajax({
+                url: '/fixed/sentence',
+                type: 'POST',
+                data: JSON.stringify(param),
+                async: false,
+                dataType: 'text'
+            }).done(function (data) {
+                // $("#txt").val(data)
+                console.log(data)
+                try{
+                    sendDataToAndroid(data.replace(/\s+/g, ' ').trim())
+                }
+                catch (e) {
+                    console.log(e); // Logs the error
+                }
+                try{
+                    result = data.split(/[,.?;]/)
+
+                    for (const element of result) {
+                        console.log(element);
+                        speak(element);
+                    }
+
+                }
+                catch (e) {
+                    console.log(e); // Logs the error
+                }
+
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+
+            });
+        }
+
+
+    </script>
+    <style>
+        /**
+     * Owl Carousel v2.3.4
+     * Copyright 2013-2018 David Deutsch
+     * Licensed under: SEE LICENSE IN https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE
+     */
+        /**
+     * Owl Carousel v2.3.4
+     * Copyright 2013-2018 David Deutsch
+     * Licensed under: SEE LICENSE IN https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE
+     */
+        .owl-theme .owl-dots,.owl-theme .owl-nav{text-align:center;-webkit-tap-highlight-color:transparent}.owl-theme .owl-nav{margin-top:10px}.owl-theme .owl-nav [class*=owl-]{color:#FFF;font-size:14px;margin:5px;padding:4px 7px;background:#D6D6D6;display:inline-block;cursor:pointer;border-radius:3px}.owl-theme .owl-nav [class*=owl-]:hover{background:#869791;color:#FFF;text-decoration:none}.owl-theme .owl-nav .disabled{opacity:.5;cursor:default}.owl-theme .owl-nav.disabled+.owl-dots{margin-top:10px}.owl-theme .owl-dots .owl-dot{display:inline-block;zoom:1}.owl-theme .owl-dots .owl-dot span{width:10px;height:10px;margin:5px 7px;background:#D6D6D6;display:block;-webkit-backface-visibility:visible;transition:opacity .2s ease;border-radius:30px}.owl-theme .owl-dots .owl-dot.active span,.owl-theme .owl-dots .owl-dot:hover span{background:#869791}
+
+        .owl-carousel,.owl-carousel .owl-item{-webkit-tap-highlight-color:transparent;position:relative}.owl-carousel{display:none;width:100%;z-index:1}.owl-carousel .owl-stage{position:relative;-ms-touch-action:pan-Y;touch-action:manipulation;-moz-backface-visibility:hidden}.owl-carousel .owl-stage:after{content:".";display:block;clear:both;visibility:hidden;line-height:0;height:0}.owl-carousel .owl-stage-outer{position:relative;overflow:hidden;-webkit-transform:translate3d(0,0,0)}.owl-carousel .owl-item,.owl-carousel .owl-wrapper{-webkit-backface-visibility:hidden;-moz-backface-visibility:hidden;-ms-backface-visibility:hidden;-webkit-transform:translate3d(0,0,0);-moz-transform:translate3d(0,0,0);-ms-transform:translate3d(0,0,0)}.owl-carousel .owl-item{min-height:1px;float:left;-webkit-backface-visibility:hidden;-webkit-touch-callout:none}.owl-carousel .owl-item img{display:block;width:100%}.owl-carousel .owl-dots.disabled,.owl-carousel .owl-nav.disabled{display:none}.no-js .owl-carousel,.owl-carousel.owl-loaded{display:block}.owl-carousel .owl-dot,.owl-carousel .owl-nav .owl-next,.owl-carousel .owl-nav .owl-prev{cursor:pointer;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.owl-carousel .owl-nav button.owl-next,.owl-carousel .owl-nav button.owl-prev,.owl-carousel button.owl-dot{background:0 0;color:inherit;border:none;padding:0!important;font:inherit}.owl-carousel.owl-loading{opacity:0;display:block}.owl-carousel.owl-hidden{opacity:0}.owl-carousel.owl-refresh .owl-item{visibility:hidden}.owl-carousel.owl-drag .owl-item{-ms-touch-action:pan-y;touch-action:pan-y;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.owl-carousel.owl-grab{cursor:move;cursor:grab}.owl-carousel.owl-rtl{direction:rtl}.owl-carousel.owl-rtl .owl-item{float:right}.owl-carousel .animated{animation-duration:1s;animation-fill-mode:both}.owl-carousel .owl-animated-in{z-index:0}.owl-carousel .owl-animated-out{z-index:1}.owl-carousel .fadeOut{animation-name:fadeOut}@keyframes fadeOut{0%{opacity:1}100%{opacity:0}}.owl-height{transition:height .5s ease-in-out}.owl-carousel .owl-item .owl-lazy{opacity:0;transition:opacity .4s ease}.owl-carousel .owl-item .owl-lazy:not([src]),.owl-carousel .owl-item .owl-lazy[src^=""]{max-height:0}.owl-carousel .owl-item img.owl-lazy{transform-style:preserve-3d}.owl-carousel .owl-video-wrapper{position:relative;height:100%;background:#000}.owl-carousel .owl-video-play-icon{position:absolute;height:80px;width:80px;left:50%;top:50%;margin-left:-40px;margin-top:-40px;background:url(owl.video.play.png) no-repeat;cursor:pointer;z-index:1;-webkit-backface-visibility:hidden;transition:transform .1s ease}.owl-carousel .owl-video-play-icon:hover{-ms-transform:scale(1.3,1.3);transform:scale(1.3,1.3)}.owl-carousel .owl-video-playing .owl-video-play-icon,.owl-carousel .owl-video-playing .owl-video-tn{display:none}.owl-carousel .owl-video-tn{opacity:0;height:100%;background-position:center center;background-repeat:no-repeat;background-size:contain;transition:opacity .4s ease}.owl-carousel .owl-video-frame{position:relative;z-index:1;height:100%;width:100%}
+    </style>
+
+
+
+        <div data-role="page"  data-theme="b" >
+
+            <div data-role="header"  data-position="fixed">
+                <h1>&nbsp;</h1>
+                <a href="#nav-panel" data-icon="bars" data-iconpos="notext">Menu</a>
+                <a href="#add-form" data-icon="gear" data-iconpos="notext">Add</a>
+            </div>
+            <div role="main"  >
+                <div id="main"  >
+                    {% block body %}{% endblock %}
+                </div>
+{#                <a class="icon-footer-right ui-btn  ui-icon-audio ui-btn-icon-notext" id="play" onclick="speak()"></a>#}
+                <a class="icon-footer-right ui-btn  ui-icon-audio ui-btn-icon-notext" id="play" onclick="speakIa()"></a>
+                <a class="icon-footer-left ui-btn ui-icon-delete ui-btn-icon-notext" onclick="reset()"></a>
+            </div>
+
+            <div data-role="footer" data-position="fixed">
+                <div class="box">
+                    <div id="listWord" class="listWord">
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div data-role="panel" data-display="push" id="nav-panel">
+                <ul data-role="listview">
+                    <li data-icon="delete"><a href="#" data-rel="close">&nbsp;</a></li>
+                    <li><a href="/" data-ajax="false">All</a></li>
+                    <li><a href="/sentences" data-ajax="false">Sentance</a></li>
+                    <li><a href="/speaker" data-ajax="false">Speaker</a></li>
+                    <li><a href="/admin" data-ajax="false">Admin</a></li>
+                </ul>
+            </div>
+            <div data-role="panel" data-position="right" data-display="push" id="add-form">
+                <form>
+                    <label for="lang">Choise you language {{ app.session.get('lang') }}:</label>
+                    <select class="" id="lang"  onchange="setLang(this);">
+                        <option {% if ( app.session.get('lang') == 2) %}selected{% endif %} value="2">es</option>
+                        <option {% if ( app.session.get('lang') == 1) %}selected{% endif %} value="1">fr</option>
+                        <option {% if ( app.session.get('lang') == 4) %}selected{% endif %} value="4">cat</option>
+                        <option {% if ( app.session.get('lang') == 3) %}selected{% endif %} value="3">en</option>
+                        <option {% if ( app.session.get('lang') == 5) %}selected{% endif %} value="5">de</option>
+                    </select>
+
+
+                    <label for="speakOnClick">Speak on touch :</label>
+                    <input type="checkbox" data-role="flipswitch" name="speakOnClick" id="speakOnClick">
+
+                    <label for="robotVoice">Robot Voice :</label>
+                    <input type="checkbox" data-role="flipswitch" name="robotVoice" id="robotVoice">
+                </form>
+            </div>
+        </div>
+
+
+
+    <style>
+        .hero {
+            /*display: inline-block;*/
+            position: relative;
+            /*width: 160px;*/
+            /*min-width: 160px;*/
+            height: 150px;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.3);
+            /*margin: 10px;*/
+
+
+            /*display: inline-block;*/
+            /*position: relative;*/
+            /*!*width: 25vw;*!*/
+            /*min-width: 30vw;*/
+            /*height: 25vw;*/
+            /*border-radius: 30px;*/
+            /*overflow: hidden;*/
+            /*box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.3);*/
+            /*margin: 0;*/
+            /*flex: 1;*/
+
+        }
+
+        .hero-profile-img {
+            height: 100%;
+            margin: 0 auto;
+            /* position: relative; */
+            display: flex
+        ;
+        }
+
+        .hero-description-bk {
+            position: absolute;
+            /*top: 63%;*/
+            /* left: -5px; */
+            /*height: 37%;*/
+            width: 108%;
+            bottom: 0;
+            max-height: 45%;
+            /* transform: skew(19deg, -9deg); */
+            text-align: center;
+        }
+
+        .second .hero-description-bk {
+            background-image: linear-gradient(-20deg, #bb7413, #e7d25c)
+        }
+
+        .hero-logo {
+            height: 80px;
+            width: 80px;
+            border-radius: 20px;
+            background-color: #fff;
+            position: absolute;
+            bottom: 30%;
+            left: 30px;
+            overflow: hidden;
+            box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero-logo img {
+            height: 100%;
+        }
+
+        .hero-description {
+            /*position: absolute;*/
+            color: #fff;
+            /* left: 30px; */
+            /* bottom: 0; */
+            font-size: xx-small;
+            padding: 0 15px 0 5px;
+            display: flex
+        ;
+            justify-content: center;
+            align-items: end;
+            height: 100%;
+        }
+        }
+
+        .hero-btn {
+            position: absolute;
+            color: #fff;
+            right: 30px;
+            bottom: 10%;
+            padding: 10px 20px;
+            border: 1px solid #fff;
+        }
+
+        .hero-btn a {
+            color: #fff;
+        }
+
+        .hero-date {
+            position: absolute;
+            color: #fff;
+            left: 30px;
+            bottom: 10%;
+        }
+
+    </style>
+    </body>
+</html>

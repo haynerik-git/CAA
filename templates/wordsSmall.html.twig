@@ -1,0 +1,16 @@
+{% set action = "actionWord" %}
+
+<div class="box cell image-checkbox"
+     onclick='{{ action }}("{{ word.id }}", "{{ word.getWordTranslationsByLang(app.session.get('lang')) }}", {{ cat.id }}, 1);
+             $(this).toggleClass("image-checkbox-checked")
+             '
+     data-wordId="{{ word.id }}"
+     data-wordName="{{ word.getWordTranslationsByLang(app.session.get('lang')) }}"
+     data-catId="{{ cat.id }}"
+
+>
+    <i class="material-icons">select_check_box</i>
+    <img su-media-id="{{ word.name }}"  src="{{ asset('images/' ~ word.filename) }}" alt="{{ word.name }}" style="">
+    <span>{{ word.getWordTranslationsByLang(app.session.get('lang')) }}</span>
+</div>
+

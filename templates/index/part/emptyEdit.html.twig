@@ -1,0 +1,28 @@
+<div class="grid-cell "
+    {% if deleteId is defined %}
+        data-id="{{ deleteId }}"
+     {% endif %}
+        >
+        {% if deleteId is defined %}
+            <button id="cat{{ deleteId }}" class="notPrint remove"
+                    onclick="removeItem(this,{{ deleteId }},'categorie')"
+            >
+                 <span class="material-icons">
+                    close
+                </span>
+            </button>
+        {% endif %}
+    {% if addId is defined and addId != 0 %}
+        <button id="catAdd{{ addId }}" class="notPrint add"
+                onclick="addBlockWord( 'empty' , {{ addId }})"
+        >
+                 <span class="material-icons">
+                    add
+                </span>
+        </button>
+    {% endif %}
+    <div class="containerImage">
+        <span>Empty Block</span>
+    </div>
+{#    <input type="text" class="description" value="{{ word.getWordTranslationsByLang(app.session.get('lang'))  }}"></input>#}
+</div>

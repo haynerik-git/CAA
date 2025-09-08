@@ -1,0 +1,123 @@
+
+
+{% block body %}
+
+    {{ _self.recursiveCategory1(level,cats) }}
+
+<div id="level{{ level + 2  }}">
+    level{{ level + 2  }}
+</div>
+
+    {% macro recursiveCategory1(id,categories) %}
+
+
+                        {% for cat in  categories %}
+{% if cat.getWordCategories()|length > 0 %}
+<div id='tabs{{ id }}-{{ cat.id }}'
+     class='rounded-block slider slider-{{ cat.id }}'>
+
+                                    <div id="tabs" >
+                                        <div class="tab_container">
+                                            {% if cat.getSentences()|length > 0 %}
+                                                <input id="tab2" type="radio" name="tabs" checked>
+                                                <label for="tab2" class="tabCarroussel" data-slider="owl-carouselSentences{{ id }}-{{ cat.id }}"><i class="fa fa-pencil-square-o" ></i><span>Sentences</span></label>
+                                            {% endif %}
+
+                                                <input id="tab1" type="radio" name="tabs"
+                                                       {% if cat.getSentences()|length == 0 %}
+                                                            checked
+                                                       {% endif %}
+                                                >
+                                                <label for="tab1" class="tabCarroussel" data-slider="owl-carouselWords{{ id }}-{{ cat.id }}"><i class="fa fa-code tabCarroussel"></i><span>Words</span></label>
+
+
+                                            <section id="content1" class="tab-content">
+
+                                                <div class='owl-carousel owl-theme owl-carouselWords{{ id }}-{{ cat.id }}'
+
+                                                >
+                                                    {% for word in cat.getWordCategories() %}
+                                                        {% include '/word.html.twig' %}
+                                                    {% endfor %}
+                                                </div>
+                                                <script>
+                                                    $(document).ready(function() {
+                                                        {#                                                    {% if loop.first %}#}
+                                                        {#var carroussel = createSlider('owl-carouselWords{{ id }}-{{ cat.id }}',3);#}
+                                                        {#                                                    {% endif %}#}
+
+                                                    });
+                                                </script>
+                                            </section>
+
+                                            <section id="content2" class="tab-content">
+                                                <div id="filterSentences{{ id }}-{{ cat.id }}">
+                                                    <div class='owl-carousel owl-theme owl-carouselSentences{{ id }}-{{ cat.id }}'
+                                                         data-slider="owl-carouselSentences{{ id }}-{{ cat.id }}"
+                                                    >
+                                                        {% for word in cat.getSentences() %}
+                                                            {% include '/sentenceList.html.twig' %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </section>
+                                            <script>
+                                                // $(document).ready(function() {
+{#                                                                                                        {% if loop.first %}#}
+                                                    var carroussel = createSlider('owl-carouselSentences{{ id }}-{{ cat.id }}',2);
+{#                                                                                                        {% endif %}#}
+{##}
+//                                                 });
+                                            </script>
+
+                                        </div>
+
+
+{#                                        <div data-role="navbar">#}
+{#                                            <ul>#}
+{#                                                <li><a href="#filterWords{{ id }}-{{ cat.id }}" data-id="{{ id }}-{{ cat.id }}"  data-ajax="true">Words</a></li>#}
+{#                                                {% if cat.getSentences()|length > 0 %}#}
+{#                                                    <li><a href="/sentencesCatId/{{ cat.id }}-{{ id }}" data-ajax="true" data-id="{{ id }}-{{ cat.id }}" >Sentences</a></li>#}
+{#                                                {% endif %}#}
+{#                                            </ul>#}
+{#                                        </div>#}
+                                        <div id="filterWords{{ id }}-{{ cat.id }}" class="">
+
+{#                                            <div class='owl-carousel owl-theme owl-carouselWords{{ id }}-{{ cat.id }}'>#}
+{#                                                {% for word in cat.getWordCategories() %}#}
+{#                                                    {% include '/word.html.twig' %}#}
+{#                                                {% endfor %}#}
+{#                                            </div>#}
+{#                                            <script>#}
+{#                                                $(document).ready(function() {#}
+{#                                                    {% if loop.first %}#}
+{#                                                        var carroussel = createSlider('owl-carouselWords{{ id }}-{{ cat.id }}',3);#}
+{#                                                    {% endif %}#}
+
+{#                                                });#}
+{#                                            </script>#}
+                                        </div>
+{#                                        <div id="filterSentences{{ id }}-{{ cat.id }}">#}
+{#                                            <div class='owl-carousel owl-theme owl-carouselSentences{{ id }}-{{ cat.id }}'>#}
+{#                                                {% for word in cat.getSentences() %}#}
+{#                                                    {% include '/sentence.html.twig' %}#}
+{#                                                {% endfor %}#}
+{#                                            </div>#}
+{#                                        </div>#}
+                                    </div>
+                                    </div>
+    <script>
+
+
+        {#$("#tabs{{ id }}-{{ cat.id }}").tabs().trigger("create");#}
+
+    </script>
+    {% endif %}
+                        {% endfor %}
+
+
+
+
+    {% endmacro %}
+
+{% endblock %}
