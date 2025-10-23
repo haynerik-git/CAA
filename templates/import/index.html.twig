@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'empty.html.twig' %}
 
 {% block title %}Hello ImportController!{% endblock %}
 
@@ -9,12 +9,9 @@
 </style>
 
 <div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/admin/src/Controller/ImportController.php</code></li>
-        <li>Your template at <code>/var/www/html/admin/templates/import/index.html.twig</code></li>
-    </ul>
+    <form action="/import/importRes">
+        <input type="text" name="search" required>
+        <input type="submit" value="Importer">
+    </form>
 </div>
 {% endblock %}

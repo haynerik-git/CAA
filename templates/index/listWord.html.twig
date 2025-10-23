@@ -3,21 +3,22 @@
     {% set action = "removeWord" %}
     {% set sentence = "" %}
 {#    {{ words | length }}#}
-    <div class='owl-carousel owl-theme owl-carousel-words'>
+    <div class='owl-carousel owl-theme owl-carousel-words' style="    display: -webkit-inline-box;overflow: scroll;">
         {% for word in words %}
             {% include '/wordsSmall.html.twig' %}
             {% set sentence = sentence ~ " " ~ word.getWordTranslationsByLang(app.session.get('lang'))  %}
         {% endfor %}
     </div>
     <input type="text" id="txt" value="{{ sentence }}" style="display:none;"></input>
-    <script>
+    <input type="text" id="lang" value="{{ app.session.get('lang') }}" style="display:none;"></input>
+{#    <script>#}
 
-        $(document).ready(function() {
-            var carroussel = createSliderSentences('owl-carousel-words',1, {{ words | length }});
-            {#$('.owl-carousel-words').slick('slickGoTo', {{ (words | length) - 1 }}, false)#}
-            {#$("#tabstest{{ id }}").tabs().trigger("create");#}
-        });
-    </script>
+{#        $(document).ready(function() {#}
+{#            var carroussel = createSliderSentences('owl-carousel-words',1, {{ words | length }});#}
+{#            #}{#$('.owl-carousel-words').slick('slickGoTo', {{ (words | length) - 1 }}, false)#}
+{#            #}{#$("#tabstest{{ id }}").tabs().trigger("create");#}
+{#        });#}
+{#    </script>#}
 
 
 {% endblock %}

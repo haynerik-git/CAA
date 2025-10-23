@@ -1,28 +1,35 @@
 
 
-<div id="grid-container" class="grid-container-menu ">
+<div id="grid-container" class="grid-container-menu notPrint">
     <div class="grid-cell grid-cell-menu ">
         <div class="containerImage">
-            <a href="/">
+            <a id="goHome">
                 <img src="/img/home.png">
                 <span>Home</span>
             </a>
         </div>
     </div>
-    <div class="grid-cell grid-cell-menu " onclick="{% if page.autoSpeak %}speak();{% else %}speakIa(){% endif %}">
+    <div class="grid-cell grid-cell-menu " onclick="{% if page.autoSpeak %}speak(null,true);{% else %}speakIa(){% endif %}">
         <div class="containerImage">
             <img src="/img/speaker.png">
-            <span>{% if page.autoSpeak %}Repeat {% else%}Speak {% endif %}</span>
+            <span>{% if page.autoSpeak %}Repeat {% else%}Speak {% endif %}
+            </span>
         </div>
     </div>
 
     <div class="grid-cell grid-cell-menu grid-cell-input">
-        <div class="containerImage">
-            <input id='txt' type="text" value="" />
+        <div class="" id="listWord">
+            {% include('/index/listWord.html.twig') %}
         </div>
     </div>
 
-    <div class="grid-cell grid-cell-menu " onclick="$('.categories-container').show();$('.word-container').hide();">
+    <div class="grid-cell grid-cell-menu pageLink"
+            {% if prevPage is not null and nextPage is null %}
+{#         data-id="{{ pageOrder.getPagePicto().id }}"#}
+                 data-id="{{ prevPage.id }}"
+            {% endif %}
+{#         onclick="$('.categories-container').show();$('.word-container').hide();"#}
+    >
         <div class="containerImage">
             <img src="/img/back.png">
             <span>Back</span>

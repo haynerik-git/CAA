@@ -1,0 +1,86 @@
+
+    {% set addId = 0 %}
+    {% set i=0 %}
+{#    {% set sepa %}#}
+
+
+
+
+
+            <input type="hidden" id="pageId" value="{{ page.id }}">
+            <input type="hidden" id="typeLoaded" value="page">
+        {% for pageOrder in pageOrders|sort((a, b) => a.getOrderDisplay() <=> b.getOrderDisplay()) %}
+            {% set i=i+1 %}
+            {% if pageOrder.type == 'categorie' %}
+                {% set cat= pageOrder.getUserCategories()  %}
+                {% set deleteId= pageOrder.id  %}
+                {% set editId= pageOrder.id  %}
+                {% set hidden= pageOrder.hidden  %}
+                {% set hiddenId = pageOrder.id  %}
+                {% include('/index/part/categorieEdit.html.twig') %}
+
+            {% elseif pageOrder.type == 'empty' %}
+                {% set deleteId= pageOrder.id  %}
+    {#            {% set idCat= pageOrder.id  %}#}
+                {% include('/index/part/emptyEdit.html.twig') %}
+            {% elseif pageOrder.type == 'word' %}
+    {#            {% set id = id+1 %}#}
+                {% set word= pageOrder.getWord()  %}
+                {% set deleteId= pageOrder.id  %}
+                {% set editId= word.id  %}
+                {% set idCat= pageOrder.id  %}
+                {% set hidden= pageOrder.hidden  %}
+                {% set hiddenId = pageOrder.id  %}
+                {% include('/index/part/wordEdit.html.twig') %}
+            {% elseif pageOrder.type == 'page' %}
+                {#            {% set id = id+1 %}#}
+                {% set page= pageOrder.getPagePicto()  %}
+                {% set deleteId= pageOrder.id  %}
+                {% set editId= page.id  %}
+                {% set idCat= pageOrder.id  %}
+                {% set hidden= pageOrder.hidden  %}
+                {% set hiddenId = pageOrder.id  %}
+                {% include('/index/part/pageEdit.html.twig') %}
+            {% elseif pageOrder.type == 'action' %}
+                <div class="grid-cell grid-cell-{{ pageOrder.sizeCell }}"
+                     data-id="{{ pageOrder.id }}"
+                     onclick='{{ pageOrder.getAction().actionJS }}'
+                >
+                    <div class="containerImage">
+                        <span>{{ pageOrder.getAction().title }}</span>
+                    </div>
+                </div>
+            {% elseif pageOrder.type == 'input' %}
+                <div class="grid-cell grid-cell-{{ pageOrder.sizeCell }}"
+                     data-id="{{ pageOrder.id }}"
+                >
+                    <div class="containerImage">
+                        <span><input type="text" name="text"></span>
+                    </div>
+                </div>
+            {% elseif pageOrder.type == 'youtube' %}
+                <div class="grid-cell"
+                     data-id="{{ pageOrder.id }}"
+                     onclick=''
+                >
+                    <div class="containerImage">
+                        <iframe width="100%" height="100%" src="{{ pageOrder.getYoutube().url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+            {% elseif pageOrder.type == 'sentence' %}
+                {% set sentence= pageOrder.getSentence()  %}
+                {% set deleteId= pageOrder.id  %}
+                {% set editId = sentence.id %}
+                {% include('/index/part/sentenceEdit.html.twig') %}
+            {% endif %}
+            {% if i ==  (col * row ) %}
+                {% set i=0 %}
+{#                <div class="flexFull notPrint ">#}
+{#                    next page#}
+{#                </div>#}
+                <div class="pageBreak"></div>
+            {% endif %}
+        {% endfor %}
+
+{#    </div>#}

@@ -1,4 +1,8 @@
 <div class="grid-cell "
+     style="background:
+     {% if cat.getType() is not null %}
+                {{ cat.getType().color }};
+     {% endif %}"
         {% if deleteId is defined %}
             data-id="{{ deleteId }}"
         {% endif %}
@@ -22,6 +26,9 @@
                         href="/categorieEditor?id={{ editId }}"
                         data-id="{{ cat.id }}"
                         data-title="{{ cat.label }}"
+                        {% if  cat.getType() is not null %}
+                            data-config="{{  cat.getType().getId() }}"
+                        {% endif %}
                         data-src="{{ asset('images/' ~ cat.img) }}"
                 >
                      <span class="material-icons">

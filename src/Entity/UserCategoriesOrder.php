@@ -41,6 +41,9 @@ class UserCategoriesOrder
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $sizeCell = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $hidden = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -154,6 +157,18 @@ class UserCategoriesOrder
     public function setSizeCell(?string $sizeCell): static
     {
         $this->sizeCell = $sizeCell;
+
+        return $this;
+    }
+
+    public function isHidden(): ?bool
+    {
+        return $this->hidden;
+    }
+
+    public function setHidden(?bool $hidden): static
+    {
+        $this->hidden = $hidden;
 
         return $this;
     }

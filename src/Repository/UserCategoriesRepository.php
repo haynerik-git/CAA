@@ -21,6 +21,21 @@ class UserCategoriesRepository extends ServiceEntityRepository
         parent::__construct($registry, UserCategories::class);
     }
 
+
+    public function search($value): array
+    {
+        return $this->createQueryBuilder('c')
+//            ->leftJoin('w.wordTranslations', 'translation' ,'WITH', 'translation.lang = 2' )
+            ->where('c.label like  :searchterm')
+            ->setParameter('searchterm', '%'.$value.'%')
+
+            ->orderBy("c.label")
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+
     //    /**
     //     * @return UserCategories[] Returns an array of UserCategories objects
     //     */

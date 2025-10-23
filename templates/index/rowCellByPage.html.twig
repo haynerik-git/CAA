@@ -16,7 +16,7 @@
             --headerHeight:1.2cm;
             --margeTop: 1.5cm;
             --fontFamily:{{ page.font }};
-            --size: clamp(250px, 50vmin);
+            --size: clamp(250px, 50vmin, 300px);
             @media screen and (max-width: 640px) {
                 /*--column: 4;*/
                 /*--row: 4;*/
@@ -29,12 +29,21 @@
             }
         }
 
+
+
     </style>
 
 
 {% include('/index/menu/menu.html.twig') %}
 
-    <div id="grid-container"  class="grid-container categories-container">
+    <div id="grid-container"  class="grid-container categories-container"
+{#         style="#}
+{#    background-image: url('https://img.freepik.com/vector-gratis/nino-feliz-camisa-roja_1308-69947.jpg');#}
+{#    background-repeat: no-repeat;#}
+{#    background-position: center;#}
+{#    background-size: 17%;#}
+{#"#}
+    >
         {% set orders = pageOrders %}
         {% set CategoriesID = [{ k: 'vide'}] %}
         {% set array = [{ k: 'vide', v: 'vide' }] %}

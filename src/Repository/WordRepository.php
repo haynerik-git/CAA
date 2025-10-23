@@ -28,10 +28,28 @@ class WordRepository extends ServiceEntityRepository
                 ->andWhere('w.id IN ( :val )')
                 ->setParameter('val',  $value)
                 ->orderBy("field(w.id, ". implode(',', $value)." )")
+//                ->orderBy("field(w.id, ". implode(',', $value)." )")
             ->getQuery()
                 ->getResult()
             ;
         }
+
+    public function search($value, $langId = 1): array
+    {
+
+        return $this->createQueryBuilder('w')
+            ->leftJoin('w.wordTranslations', 'translation' ,'WITH', 'translation.lang = '.$langId )
+            ->where('translation.name like  :searchterm')
+            ->orWhere('w.name like  :searchterm')
+//            ->where('w.name = :searchterm')
+            ->setParameter('searchterm', '%'.$value.'%')
+
+            ->orderBy("translation.name", 'asc')
+//            ->orderBy("wl.name")
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 
     //    /**
     //     * @return Word[] Returns an array of Word objects

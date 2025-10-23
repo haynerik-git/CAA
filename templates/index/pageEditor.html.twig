@@ -32,7 +32,104 @@
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/0.8.1/cropper.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropper/2.3.4/cropper.min.css">
+
+    <script>
+
+        /************* throtle ****************/
+        /*
+         * jQuery throttle / debounce - v1.1 - 3/7/2010
+         * http://benalman.com/projects/jquery-throttle-debounce-plugin/
+         *
+         * Copyright (c) 2010 "Cowboy" Ben Alman
+         * Dual licensed under the MIT and GPL licenses.
+         * http://benalman.com/about/license/
+         */
+        (function(b,c){var $=b.jQuery||b.Cowboy||(b.Cowboy={}),a;$.throttle=a=function(e,f,j,i){var h,d=0;if(typeof f!=="boolean"){i=j;j=f;f=c}function g(){var o=this,m=+new Date()-d,n=arguments;function l(){d=+new Date();j.apply(o,n)}function k(){h=c}if(i&&!h){l()}h&&clearTimeout(h);if(i===c&&m>e){l()}else{if(f!==true){h=setTimeout(i?k:l,i===c?e-m:e)}}}if($.guid){g.guid=j.guid=j.guid||$.guid++}return g};$.debounce=function(d,e,f){return f===c?a(d,e,false):a(d,f,e!==false)}})(this);
+        /************* end throtle ****************/
+
+        $(document).on("click", ".wordEdit", function(){
+
+            id = $(this).attr('data-id')
+
+            title = $(this).attr('data-title')
+            src = $(this).attr('data-src')
+            typeConfig = $(this).attr('data-config')
+            {% for lang in langs %}
+            title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')
+            $('#titleGeneric{{ lang.name }}').val(title{{ lang.name }})
+            {% endfor %}
+            $('#titleGeneric').val(title)
+            $('.result').html('')
+            $('#file-input').val('')
+            $('#typeGeneric').val('word')
+            $('#typeConfigGeneric').val(typeConfig)
+            // $('#actionGeneric').val('edit')
+            $('#actionGeneric').val('edit')
+            $('#idGeneric').val(id)
+            $('#imageResult').attr('src', src )
+            $('#dialog-form').parent().find('.ui-dialog-title').first().html('Update word')
+            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('Update word')
+            // fieldForm(id)
+            dialog.dialog( "open" );
+        });
+
+
+        $(document).on("click", ".categorieEdit", function(){
+        // $( ".categorieEdit" ).on( "click", function() {
+            id = $(this).attr('data-id')
+            title = $(this).attr('data-title')
+            src = $(this).attr('data-src')
+            typeConfig = $(this).attr('data-config')
+            {% for lang in langs %}
+                title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')
+                $('#titleGeneric{{ lang.name }}').val(title{{ lang.name }})
+            {% endfor %}
+            $('#typeConfigGeneric').val(typeConfig)
+            $('#imageResult').attr('src', src )
+            $('.result').html('')
+            $('#file-input').val('')
+            $('#titleGeneric').val(title)
+            $('#typeGeneric').val('categorie')
+            $('#actionGeneric').val('edit')
+            $('#idGeneric').val(id)
+            $('#titleGeneric').val(title)
+            $('#dialog-form').parent().find('.ui-dialog-title').first().html('Update categorie')
+            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('Update categorie')
+            // fieldForm(id)
+            dialog.dialog( "open" );
+        });
+
+        $(document).on("click", ".gridManager", function(){
+            $.ajax({
+                method: "POST",
+                url: "/categorieEditor?id=" + $(this).attr('data-id'),
+                {#data: { title: this.value, idCat: {{ idCat }} }#}
+            })
+            .done(function( msg ) {
+                // alert( "Data Saved: " + msg );
+                $('.pictoContainer').html(msg)
+            });
+        });
+
+        $(document).on("click", ".pageOrderEdit", function(){
+            $.ajax({
+                method: "POST",
+                url: "/pageOrderAjaxEditor?id=" + $(this).attr('data-id'),
+                {#data: { title: this.value, idCat: {{ idCat }} }#}
+            })
+                .done(function( msg ) {
+                    // alert( "Data Saved: " + msg );
+                    $('.pictoContainer').html(msg)
+                });
+        });
+
+
+    </script>
+
+
 <script>
+
+
 
     $(document).ready(function() {
 
@@ -111,7 +208,8 @@
             id = $('#idGeneric').val()
             type = $('#typeGeneric').val()
             action = $('#actionGeneric').val()
-            data =     { id: id, name: $('#titleGeneric').val(), type: type , action: action, img: imgSrc }
+            typeConfig = $('#typeConfigGeneric').val()
+            data =     { id: id, name: $('#titleGeneric').val(), type: type ,typeConfig: typeConfig , action: action, img: imgSrc }
             {% for lang in langs %}
             data.{{lang.name }} = $('#titleGeneric{{ lang.name }}').val()
             {% endfor %}
@@ -121,11 +219,13 @@
                 data: data
             })
                 .done(function( msg ) {
-                    // alert( "Data Saved: " + msg );
+                    // alert( "Data Saved: ");
+                    $("#sucessMessage" ).fadeIn(400).delay(2000).fadeOut(400);
                     // $('.grid-container').append( msg);
                 });
 
             // cropper.destroy()
+
             // alert('done')
         });
 
@@ -177,6 +277,7 @@
             $('#actionGeneric').val('add')
             $('#idGeneric').val('')
             $('#titleGeneric').val('')
+            $('#titleConfigGeneric').val(0)
             $('.result').html('')
             $('#imageResult').attr('src', '' )
             $('#dialog-form').parent().find('.ui-dialog-title').first().html('Add word')
@@ -192,6 +293,7 @@
             $('#actionGeneric').val('add')
             $('#idGeneric').val('')
             $('#titleGeneric').val('')
+            $('#titleConfigGeneric').val(0)
             $('.result').html('')
             {% for lang in langs %}
                 $('#titleGeneric{{ lang.name }}').val('')
@@ -210,6 +312,7 @@
             $('#actionGeneric').val('add')
             $('#idGeneric').val('')
             $('#titleGeneric').val('')
+            $('#titleConfigGeneric').val(0)
             $('.result').html('')
             {% for lang in langs %}
                 $('#titleGeneric{{ lang.name }}').val('')
@@ -229,58 +332,13 @@
             $('#idGeneric').val('')
             $('#titleGeneric').val('')
             $('.result').html('')
+            $('#titleConfigGeneric').val(0)
             {% for lang in langs %}
             $('#titleGeneric{{ lang.name }}').val('')
             {% endfor %}
             $('#imageResult').attr('src', '' )
             $('#dialog-form').parent().find('.ui-dialog-title').first().html('New page')
             $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('New Page')
-            // fieldForm(id)
-            dialog.dialog( "open" );
-        });
-
-
-        $( ".wordEdit" ).on( "click", function() {
-            id = $(this).attr('data-id')
-
-            title = $(this).attr('data-title')
-            src = $(this).attr('data-src')
-            {% for lang in langs %}
-                 title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')
-                 $('#titleGeneric{{ lang.name }}').val(title{{ lang.name }})
-            {% endfor %}
-            $('#titleGeneric').val(title)
-            $('.result').html('')
-            $('#file-input').val('')
-            $('#typeGeneric').val('word')
-            // $('#actionGeneric').val('edit')
-            $('#actionGeneric').val('edit')
-            $('#idGeneric').val(id)
-            $('#imageResult').attr('src', src )
-            $('#dialog-form').parent().find('.ui-dialog-title').first().html('Update word')
-            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('Update word')
-            // fieldForm(id)
-            dialog.dialog( "open" );
-        });
-
-        $( ".categorieEdit" ).on( "click", function() {
-            id = $(this).attr('data-id')
-            title = $(this).attr('data-title')
-            src = $(this).attr('data-src')
-            {% for lang in langs %}
-                title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')
-                $('#titleGeneric{{ lang.name }}').val(title{{ lang.name }})
-            {% endfor %}
-            $('#imageResult').attr('src', src )
-            $('.result').html('')
-            $('#file-input').val('')
-            $('#titleGeneric').val(title)
-            $('#typeGeneric').val('categorie')
-            $('#actionGeneric').val('edit')
-            $('#idGeneric').val(id)
-            $('#titleGeneric').val(title)
-            $('#dialog-form').parent().find('.ui-dialog-title').first().html('Update categorie')
-            $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('Update categorie')
             // fieldForm(id)
             dialog.dialog( "open" );
         });
@@ -301,6 +359,10 @@
             $('#file-input').val('')
             $('#idGeneric').val(id)
             $('#titleGeneric').val(title)
+{#            {% for lang in langs %}#}
+{#                title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')#}
+{#                $('#titleGeneric{{ lang.name }}').val(title{{ lang.name }})#}
+{#            {% endfor %}#}
             $('#dialog-form').parent().find('.ui-dialog-title').first().html('Update sentence')
             $('#dialog-form').parent().find('.ui-dialog-buttonset').first().find('button').first().html('Update sentence')
             // fieldForm(id)
@@ -313,8 +375,8 @@
             title = $(this).attr('data-title')
             src = $(this).attr('data-src')
             {% for lang in langs %}
-                {#title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')#}
-                $('#titleGeneric{{ lang.name }}').val('')
+                title{{ lang.name }} = $(this).attr('data-title{{ lang.name }}')
+                $('#titleGeneric{{ lang.name }}').val(title{{ lang.name }})
             {% endfor %}
             $('#imageResult').attr('src', src )
             $('#typeGeneric').val('page')
@@ -329,9 +391,7 @@
             dialog.dialog( "open" );
         });
 
-        $('.gridManager').on( "click", function() {
-            window.location.href = "/categorieEditor?id=" + $(this).attr('data-id');
-        });
+
 
         /* input */
         // cropper(1);
@@ -350,8 +410,7 @@
             })
                 .done(function( msg ) {
                     // $(document).find('#' + current.id ).parent().remove()
-
-                });
+            });
         });
 
 
@@ -363,10 +422,10 @@
                 url: "/categorieEditor/editTitleCat",
                 {#data: { title: this.value, idCat: {{ idCat }} }#}
             })
-                .done(function( msg ) {
-                    // alert( "Data Saved: " + msg );
+            .done(function( msg ) {
+                // alert( "Data Saved: " + msg );
 
-                });
+            });
             console.log(this.value)
         });
 
@@ -390,6 +449,13 @@
                 var dat = $('#grid-container .grid-cell ')
                 var index = 0
                 var order = []
+                var typeLoaded = $('#typeLoaded').val()
+                if( typeLoaded == 'page') {
+                    var url = "/pageEditor/updatePageOrder"
+                } else {
+                    var url =  "/categorieEditor/updateWordOrder"
+                }
+
                 dat.each(function(i) {
                     order[index] = {'pageOrderId' : $(this).attr('data-id'), 'catId' : $(this).attr('data-catId')}
                     index++
@@ -397,7 +463,7 @@
                 console.log(order)
                 $.ajax({
                     method: "POST",
-                    url: "/pageEditor/updatePageOrder",
+                    url: url,
                     data: { 'order' : order }
                 })
                     .done(function( msg ) {
@@ -418,6 +484,7 @@
             value: {{ col ?? 2 }},
             slide: function( event, ui ) {
                 $('#inputSlider-range-max-column').val( ui.value)
+                $('#spanSlider-range-max-column').html( ui.value)
                 myFunction_setAjax('--column', ui.value)
                 updateHeader()
                 // $( "#column" ).val( ui.value );
@@ -431,6 +498,7 @@
             value: {{ row ?? 2 }},
             slide: function( event, ui ) {
                 $('#inputSlider-range-max-row').val( ui.value)
+                $('#spanSlider-range-max-row').html( ui.value)
                 myFunction_setAjax('--row', ui.value)
                 // $( "#column" ).val( ui.value );
             }
@@ -462,22 +530,35 @@
             }
         });
 
-        $('.searchInput').on("keyup", function() {
-          // alert('coucou')
+        function ajax_lookup( event ) {
             var res = $(this).val().toLowerCase()
-            if ( res == '')
-                $('.menuEditor').find('.grid-cell').show();
-            else
-                $('.menuEditor').find('.grid-cell').hide().filter("[filter*='" + res + "']").show();
-        })
+            if ( res == '') {
+                $('.searchResult-container').html('');
+                //     $('.menuEditor').find('.grid-cell').show();
+            } else {
+                //     $('.menuEditor').find('.grid-cell').hide().filter("[filter*='" + res + "']").show();
+
+                $.ajax({
+                    method: "POST",
+                    url: "/searchResult",
+                    data: {search: res}
+                })
+                    .done(function (msg) {
+                        // alert( "Data Saved: " + msg );
+                        $('.searchResult-container').html(msg);
+                });
+            }
+        };
+
+
+// Console logging happens on window keyup, but only after
+// the user has stopped typing for 250ms.
+        $('.searchInput').keyup( $.debounce( 700, ajax_lookup ) );
+
 
         $('.searchInput').on("search", function() {
             // alert('coucou')
-            var res = $(this).val().toLowerCase()
-            if ( res == '')
-                $('.menuEditor').find('.grid-cell').show();
-            else
-                $('.menuEditor').find('.grid-cell').hide().filter("[filter*='" + res + "']").show();
+            $.debounce( 50, ajax_lookup )
         })
     })
 
@@ -520,10 +601,20 @@ function updateHeader() {
                 id = $('#categorieId').val()
         }
         console.log(id)
+        var typeLoaded = $('#typeLoaded').val()
+
+        if( typeLoaded == 'page') {
+            var data = { id: id , idPage: {{ page.id }},order: $(document).find('.grid-cell').length, type:type }
+            var url = "/pageEditor/addWord"
+        } else {
+            var url = "/categorieEditor/addWord"
+            var data ={ id: id , idCat: $('#catIdLoaded').val() ,order: $(document).find('.grid-cell').length, type:type }
+        }
+
         $.ajax({
             method: "POST",
-            url: "/pageEditor/addWord",
-            data: { id: id , idPage: {{ page.id }},order: $(document).find('.grid-cell').length, type:type }
+            url: url,
+            data: data
         })
             .done(function( msg ) {
                 // alert( "Data Saved: " + msg );
@@ -600,11 +691,16 @@ function updateHeader() {
 
     function removeItem(current,id)
     {
-        console.log(current.id)
+        var typeLoaded = $('#typeLoaded').val()
+        if( typeLoaded == 'page') {
+            var url = "/pageEditor/delete"
+        } else {
+            var url = "/categorieEditor/delete"
+        }
 
         $.ajax({
             method: "POST",
-            url: "/pageEditor/delete",
+            url: url,
             data: { id: id }
         })
         .done(function( msg ) {
@@ -617,6 +713,7 @@ function updateHeader() {
     {
         console.log(current.id)
         $(document).find('#' + current.id ).toggleClass('visibility').toggleClass('visibility_off')
+        $(document).find('#' + current.id ).next('.containerImage').toggleClass('notPrint')
         $.ajax({
             method: "POST",
             url: "/pageEditor/hide",
@@ -781,6 +878,13 @@ function toggleDrag() {
     }
         // $('.grid-cell').toggleClass('state-disabled')
 
+    // alert(typeLoaded)
+    var typeLoaded = $('#typeLoaded').val()
+    if( typeLoaded == 'page') {
+        var url = "/pageEditor/updatePageOrder"
+    } else {
+        var url = "/pageEditor/updateCategorieOrder"
+    }
 
     // $(".grid-container").sortable("enable");
     $(".grid-container").sortable({
@@ -798,7 +902,7 @@ function toggleDrag() {
             console.log(order)
             $.ajax({
                 method: "POST",
-                url: "/pageEditor/updatePageOrder",
+                url: url,
                 data: { 'order' : order }
             })
                 .done(function( msg ) {
@@ -839,11 +943,9 @@ function toggleDrag() {
 
     {% include('/index/menu/menuEdit.html.twig') %}
 
-    <div class="menuEditor">
+    <div class="menuEditor notPrint">
 
-        <div class="tab">
-
-
+        <section class="tab" style="margin: 10px" >
             <button class="tablinks" onclick="openTab(event, 'page')">
                 <span class="material-icons">
                     house
@@ -855,68 +957,102 @@ function toggleDrag() {
                     grid_view
                 </span>
             </button>
-
-{#            <button class="tablinks" onclick="openTab(event, 'tool')">#}
-{#                <span class="material-icons">#}
-{#                    build#}
-{#                </span>#}
-{#            </button>#}
-
-{#            <button class="tablinks" onclick="openTab(event, 'new')">#}
-{#                <span class="material-icons">#}
-{#                    add_box#}
-{#                </span>#}
-{#            </button>#}
-{#            <button class="tablinks" onclick="openTab(event, 'setting')">#}
-{#                <span class="material-icons">#}
-{#                    settings#}
-{#                </span>#}
-{#            </button>#}
-        </div>
+        </section>
 
         <div id="page" class="tabcontent" >
-                <h2 class="flexFull" >Page</h2>
-            <button class="pageEdit" data-id="{{ page.id }}" data-title="{{ page.title }}" data-src="{{ asset('images/' ~ page.filename) }}">Edit</button>
+            <section style="margin: 10px">
+                <h1 class="flexFull">
+                    {{ page.title }}
+                    <button class="pageEdit"
+                            data-id="{{ page.id }}"
+                            data-title="{{ page.title }}"
+                            data-src="{{ asset('images/' ~ page.filename) }}"
+                            {% for lang in langs %}
+                                data-title{{ lang.name }}="{{ page.getTranslationsByLang(lang.id) }}"
+                            {% endfor %}
+                    >
+                        Edit
+                    </button>
+                </h1>
+            </section>
 
-            <div id="frm-contact">
+
+            <section style="margin: 10px" id="frm-contact">
                 <div>
-                    <h2>Basic</h2>
+                    <h1>Basic</h1>
                     {#               col <input type="text" id="column" name="column" value="5" >#}
                     {#               row <input type="text" id="row" name="row" value="5" onchange="myFunction_set('--row', this.value)">#}
-                    background <input type="color" name="background" value="{{ page.background|default('#ffffff') }}" onchange="myFunction_setAjax('--background', this.value)">
-                    <br>
-                    Font family
-                    <select onchange="myFunction_setAjax('--fontFamily', this.value)">
-                        <option value="arial">Arial</option>
-                        <option value="Impact, fantasy">Impact, fantasy</option>
-                        <option value="Chalkduster, fantasy">Chalkduster, fantasy</option>
-                        <option value=" Verdana">Verdana</option>
-                        <option value="Comic Sans MS, Comic Sans, cursive">Comic Sans Serif</option>
-                        <option value="Trebuchet MS">Trebuchet MS</option>
-                    </select>
 
+                    <div class="nice-form-group">
+                        <label>background</label>
+                        <input type="color" name="background" value="{{ page.background|default('#ffffff') }}" onchange="myFunction_setAjax('--background', this.value)">
+                    </div>
 
-                    <br>
-                    Col
-                    <div id="slider-range-max-column"></div>
-                    <input id="inputSlider-range-max-column" value="{{ col }}" style="display: block"/>
-                    <br>
-                    Row
-                    <div id="slider-range-max-row"></div>
-                    <input id="inputSlider-range-max-row" value="{{ row }}"  style="display: block"/>
-                    <br>
-                    Drag and drop <input type="checkbox" id="drag" name="drag" checked onclick="toggleDrag()">
-                    <br>
+                    <div class="nice-form-group">
+                        <label>Font family</label>
+                        <select onchange="myFunction_setAjax('--fontFamily', this.value)">
+                            <option value="arial">Arial</option>
+                            <option value="Arial Black">Arial Black</option>
+                            <option value="Impact, fantasy">Impact, fantasy</option>
+                            <option value="Chalkduster, fantasy">Chalkduster, fantasy</option>
+                            <option value=" Verdana">Verdana</option>
+                            <option value="Comic Sans MS, Comic Sans, cursive">Comic Sans Serif</option>
+                            <option value="Trebuchet MS">Trebuchet MS</option>
+                            <option value="Marker Felt">Marker Felt</option>
+                            <option value="Trattatello">Trattatello</option>
+                        </select>
+                    </div>
+
+                    <div class="nice-form-group">
+                        <label>
+                            Col (<span id="spanSlider-range-max-column">{{ col }}</span>)
+
+                        </label>
+                         <div id="slider-range-max-column"></div>
+                        <input id="inputSlider-range-max-column" value="{{ col }}" style="display: block" type="hidden" disabled />
+                    </div>
+
+                    <div class="nice-form-group">
+                        <label>
+                            row (<span id="spanSlider-range-max-row">{{ row }}</span>)
+
+                        </label>
+                        <div id="slider-range-max-row"></div>
+                        <input id="inputSlider-range-max-row" value="{{ row }}" style="display: block" type="hidden" disabled />
+                    </div>
+
+                    <div class="nice-form-group">
+                        <input type="checkbox" id="drag" class="switch" checked onclick="toggleDrag()" />
+                        <label for="check-4">
+                            Drag and drop
+                            <small></small>
+                        </label>
+                    </div>
                 </div>
+            </section>
+            <section style="margin: 10px" >
                 <div >
-                    <h2>Box</h2>
-                    background cell <input type="color" name="backgroundCell" value="{{ page.backgroundCell|default('#ffffff') }}" onchange="myFunction_setAjax('--backgroundCell', this.value)">
-                    <br>
-                    border <input type="color" name="bordercolor" value="{{ page.border|default('#ffffff') }}" onchange="myFunction_setAjax('--border', this.value)">
-                    <br>
-                    Text Color <input type="color" name="descriptioncolor" value="{{ page.colorDescription|default('#000000') }}" onchange="myFunction_setAjax('--colorDescription', this.value)">
+                    <h1>Cards</h1>
+                    <div class="nice-form-group">
+                        <label>
+                        background cell
+                        </label>
+                        <input type="color" name="backgroundCell" value="{{ page.backgroundCell|default('#ffffff') }}" onchange="myFunction_setAjax('--backgroundCell', this.value)">
+                    </div>
+{#                    <div class="nice-form-group">#}
+{#                        <label>#}
+{#                            border#}
+{#                        </label>#}
+{#                         <input type="color" name="bordercolor" value="{{ page.border|default('#ffffff') }}" onchange="myFunction_setAjax('--border', this.value)">#}
+{#                    </div>#}
+                    <div class="nice-form-group">
+                        <label>
+                            Text Color
+                        </label>
+                        <input type="color" name="descriptioncolor" value="{{ page.colorDescription|default('#000000') }}" onchange="myFunction_setAjax('--colorDescription', this.value)">
+                    </div>
                 </div>
-            </div>
+            </section>
         </div>
 
         <div id="new" class="tabcontent" style="display: none;">
@@ -925,112 +1061,112 @@ function toggleDrag() {
 
         </div>
 
-        <div id="grid" class="tabcontent" style="display: none;">
-            <h2 class="flexFull">Grid manager</h2>
+        <section id="grid" class="tabcontent" style="display: none;margin:10px">
+{#            <h2 class="flexFull">Grid manager</h2>#}
 
-            <div class="searchBox">
-                <label class="searchLabelWrap">
-                    <span class="visually-hidden">Search</span>
-                    <svg viewBox="0 0 512 512" aria-hidden="true" class="icon" width="20">
-                        <path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z" />
-                    </svg>
-                    <input type="search" placeholder="Search" class="searchInput" name="s">
-                </label>
+            <div class="nice-form-group">
+{#                <label>Search</label>#}
+                <input type="search" placeholder="Search all the things" value=""  class="searchInput" name="s"/>
             </div>
-            <div class="grid-container-2x2">
-                {% set addId = 1 %}
-                {% include('/index/part/emptyEdit.html.twig') %}
-
-                <h3 class="flexFull">Categorie</h3>
-                {% for cat in cats %}
-                    {% set addId = cat.id %}
-                    {% set editId = cat.id %}
-                    {% include('/index/part/categorieEdit.html.twig') %}
-                {% endfor %}
-                <h3 class="flexFull">Words</h3>
-                {% for word in words %}
-                    {% set addId = word.id %}
-                    {% set editId = word.id %}
-
-                    {% include('/index/part/wordEdit.html.twig') %}
-                {% endfor %}
-                <h3 class="flexFull">Sentence</h3>
-                {% for sentence in sentences %}
-                    {% set addId = sentence.id %}
-                    {% set editId = sentence.id %}
-                    {% include('/index/part/sentenceEdit.html.twig') %}
-                {% endfor %}
-            </div>
-          </div>
+{#            <div class="searchBox">#}
+{#                <label class="searchLabelWrap">#}
+{#                    <span class="visually-hidden">Search</span>#}
+{#                    <svg viewBox="0 0 512 512" aria-hidden="true" class="icon" width="20">#}
+{#                        <path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z" />#}
+{#                    </svg>#}
+{#                    <input type="search" placeholder="Search">#}
+{#                </label>#}
+{#            </div>#}
+                {% include('/index/part/searchResult.html.twig') %}
+          </section>
         </div>
     {% set addId = 0 %}
+    {% set i=0 %}
 {#    {% set sepa %}#}
-    <div class="pageEditor">
-        <div id="grid-container"  class="grid-container categories-container">
-        {% for pageOrder in pageOrders|sort((a, b) => a.getOrderDisplay() <=> b.getOrderDisplay()) %}
+    <div class="pageEditor" style="margin: 10px 0">
 
-            {% if pageOrder.type == 'categorie' %}
-                {% set cat= pageOrder.getUserCategories()  %}
-                {% set deleteId= pageOrder.id  %}
-                {% set editId= pageOrder.id  %}
-                {% set hidden= pageOrder.hidden  %}
-                {% set hiddenId = pageOrder.id  %}
-                {% include('/index/part/categorieEdit.html.twig') %}
+        <section class="notPrint" style="margin: 0px 0px 10px">
+            <div class="breadcrumb">
+                <a href="/">
+                    Home
+                </a>
+                /
+                <a href="#" class="pageOrderEdit" data-id="{{ page.id }}">
+                    {{ page.title }}
+                </a>
+            </div>
+        </section>
 
-            {% elseif pageOrder.type == 'empty' %}
-                {% set deleteId= pageOrder.id  %}
-    {#            {% set idCat= pageOrder.id  %}#}
-                {% include('/index/part/emptyEdit.html.twig') %}
-            {% elseif pageOrder.type == 'word' %}
-    {#            {% set id = id+1 %}#}
-                {% set word= pageOrder.getWord()  %}
-                {% set deleteId= pageOrder.id  %}
-                {% set editId= word.id  %}
-                {% set idCat= pageOrder.id  %}
-                {% set hidden= pageOrder.hidden  %}
-                {% set hiddenId = pageOrder.id  %}
-                {% include('/index/part/wordEdit.html.twig') %}
-            {% elseif pageOrder.type == 'action' %}
-                <div class="grid-cell grid-cell-{{ pageOrder.sizeCell }}"
-                     data-id="{{ pageOrder.id }}"
-                     onclick='{{ pageOrder.getAction().actionJS }}'
-                >
-                    <div class="containerImage">
-                        <span>{{ pageOrder.getAction().title }}</span>
-                    </div>
-                </div>
-            {% elseif pageOrder.type == 'input' %}
-                <div class="grid-cell grid-cell-{{ pageOrder.sizeCell }}"
-                     data-id="{{ pageOrder.id }}"
-                >
-                    <div class="containerImage">
-                        <span><input type="text" name="text"></span>
-                    </div>
-                </div>
-            {% elseif pageOrder.type == 'youtube' %}
-                <div class="grid-cell"
-                     data-id="{{ pageOrder.id }}"
-                     onclick=''
-                >
-                    <div class="containerImage">
-                        <iframe width="100%" height="100%" src="{{ pageOrder.getYoutube().url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    </div>
-                </div>
+        <div id="grid-container"  class="grid-container categories-container pictoContainer">
+            {% include('/index/pageOrderEditor.html.twig') %}
+        </div>
+{#        <div id="grid-container"  class="grid-container categories-container pictoContainer">#}
+{#        {% for pageOrder in pageOrders|sort((a, b) => a.getOrderDisplay() <=> b.getOrderDisplay()) %}#}
+{#            {% set i=i+1 %}#}
+{#            {% if pageOrder.type == 'categorie' %}#}
+{#                {% set cat= pageOrder.getUserCategories()  %}#}
+{#                {% set deleteId= pageOrder.id  %}#}
+{#                {% set editId= pageOrder.id  %}#}
+{#                {% set hidden= pageOrder.hidden  %}#}
+{#                {% set hiddenId = pageOrder.id  %}#}
+{#                {% include('/index/part/categorieEdit.html.twig') %}#}
 
-            {% elseif pageOrder.type == 'sentence' %}
-                {% set sentence= pageOrder.getSentence()  %}
-                {% set deleteId= pageOrder.id  %}
-                {% set editId = sentence.id %}
-                {% include('/index/part/sentenceEdit.html.twig') %}
-            {% endif %}
-            {% if loop.index ==  (col * row ) %}
-                <div class="flexFull">
-                    next page
-                </div>
-            {% endif %}
-        {% endfor %}
+{#            {% elseif pageOrder.type == 'empty' %}#}
+{#                {% set deleteId= pageOrder.id  %}#}
+{#    #}{#            {% set idCat= pageOrder.id  %}#}
+{#                {% include('/index/part/emptyEdit.html.twig') %}#}
+{#            {% elseif pageOrder.type == 'word' %}#}
+{#    #}{#            {% set id = id+1 %}#}
+{#                {% set word= pageOrder.getWord()  %}#}
+{#                {% set deleteId= pageOrder.id  %}#}
+{#                {% set editId= word.id  %}#}
+{#                {% set idCat= pageOrder.id  %}#}
+{#                {% set hidden= pageOrder.hidden  %}#}
+{#                {% set hiddenId = pageOrder.id  %}#}
+{#                {% include('/index/part/wordEdit.html.twig') %}#}
+{#            {% elseif pageOrder.type == 'action' %}#}
+{#                <div class="grid-cell grid-cell-{{ pageOrder.sizeCell }}"#}
+{#                     data-id="{{ pageOrder.id }}"#}
+{#                     onclick='{{ pageOrder.getAction().actionJS }}'#}
+{#                >#}
+{#                    <div class="containerImage">#}
+{#                        <span>{{ pageOrder.getAction().title }}</span>#}
+{#                    </div>#}
+{#                </div>#}
+{#            {% elseif pageOrder.type == 'input' %}#}
+{#                <div class="grid-cell grid-cell-{{ pageOrder.sizeCell }}"#}
+{#                     data-id="{{ pageOrder.id }}"#}
+{#                >#}
+{#                    <div class="containerImage">#}
+{#                        <span><input type="text" name="text"></span>#}
+{#                    </div>#}
+{#                </div>#}
+{#            {% elseif pageOrder.type == 'youtube' %}#}
+{#                <div class="grid-cell"#}
+{#                     data-id="{{ pageOrder.id }}"#}
+{#                     onclick=''#}
+{#                >#}
+{#                    <div class="containerImage">#}
+{#                        <iframe width="100%" height="100%" src="{{ pageOrder.getYoutube().url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>#}
+{#                    </div>#}
+{#                </div>#}
 
-    </div>
+{#            {% elseif pageOrder.type == 'sentence' %}#}
+{#                {% set sentence= pageOrder.getSentence()  %}#}
+{#                {% set deleteId= pageOrder.id  %}#}
+{#                {% set editId = sentence.id %}#}
+{#                {% include('/index/part/sentenceEdit.html.twig') %}#}
+{#            {% endif %}#}
+{#            {% if i ==  (col * row ) %}#}
+{#                {% set i=0 %}#}
+{#                <div class="flexFull notPrint ">#}
+{#                    next page#}
+{#                </div>#}
+{#                <div class="pageBreak"></div>#}
+{#            {% endif %}#}
+{#        {% endfor %}#}
+
+{#    </div>#}
     </div>
 
 
@@ -1040,15 +1176,34 @@ function toggleDrag() {
             <input type="hidden" id="actionGeneric" value="add" />
             <input type="hidden" id="idGeneric" value="" />
             <input type="hidden" id="useridGeneric" value="1" />
-            <div class="searchBox">
-                <label class="searchLabelWrap">
-                    <input type="text" value="" name="titleGeneric" id="titleGeneric">
+            <div class="nice-form-group">
+                <label class="">
+                    Key
                 </label>
-            </div>
+                    <input type="text" value="" name="titleGeneric" id="titleGeneric" />
 
+            </div>
+            <div class="nice-form-group">
+                <label class="">
+                    type
+                </label>
+                <select name="typeConfigGeneric" id="typeConfigGeneric" >
+
+                    {% for conf in config %}
+                        <option value="{{ conf.id }}">{{ conf.name }} ( {{ conf.color }} )</option>
+
+                    {% endfor %}
+                </select>
+
+
+            </div>
             <div class="uploader">
                 <div class="box">
-                    <input type="file" id="file-input">
+                    <div class="nice-form-group">
+                        <label>File upload</label>
+                        <input type="file" id="file-input" />
+                    </div>
+{#                    <input type="file" >#}
                 </div>
                 <!-- leftbox -->
                 <div class="box-2">
@@ -1071,15 +1226,24 @@ function toggleDrag() {
                 </div>
             </div>
             {% for lang in langs %}
-                <div class="searchBox">
-                    {{ lang.name }}
-                    <label class="searchLabelWrap">
-                        <input type="text" value="" name="titleGeneric" id="titleGeneric{{ lang.name }}">
+                <div class="nice-form-group">
+
+                    <label  class="">
+                        {{ lang.name }}
                     </label>
+                    <input type="text" value="" name="titleGeneric" id="titleGeneric{{ lang.name }}">
                 </div>
             {% endfor %}
             <input type="hidden" name="userId" value="1">
         </form>
+    </div>
+
+    <div id="" class="toast-container toast-pos-right toast-pos-bottom">
+
+        <div class="toast" id="sucessMessage">
+            <a href="#" class="close-toast">&#10006;</a>
+            <b>Saved</b>
+        </div>
     </div>
 
 </body>

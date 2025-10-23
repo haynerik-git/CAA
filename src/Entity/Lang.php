@@ -30,12 +30,16 @@ class Lang
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'lang')]
     private Collection $users;
 
+    #[ORM\OneToMany(targetEntity: PageTranslation::class, mappedBy: 'lang')]
+    private Collection $pageTranslations;
+
     public function __construct()
     {
         $this->wordTranslations = new ArrayCollection();
         $this->categoriesTranslations = new ArrayCollection();
         $this->sentencesTranslations = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->pageTranslations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -174,6 +178,36 @@ class Lang
             // set the owning side to null (unless already changed)
             if ($user->getLang() === $this) {
                 $user->setLang(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PageTranslation>
+     */
+    public function getPageTranslations(): Collection
+    {
+        return $this->pageTranslations;
+    }
+
+    public function addPageTranslation(PageTranslation $pageTranslation): static
+    {
+        if (!$this->pageTranslations->contains($pageTranslation)) {
+            $this->pageTranslations->add($pageTranslation);
+            $pageTranslation->setLang($this);
+        }
+
+        return $this;
+    }
+
+    public function removePageTranslation(PageTranslation $pageTranslation): static
+    {
+        if ($this->pageTranslations->removeElement($pageTranslation)) {
+            // set the owning side to null (unless already changed)
+            if ($pageTranslation->getLang() === $this) {
+                $pageTranslation->setLang(null);
             }
         }
 

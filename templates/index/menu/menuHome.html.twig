@@ -1,14 +1,26 @@
-
-
-<div class="grid-container-menu ">
+<div class="grid-container-menu notPrint">
     <div class="grid-cell grid-cell-menu ">
-        <div class="containerImage">
-            <a href="/">
-                <img src="/img/home.png">
-                <span>Home</span>
+        <div class="containerImage menu-btn" >
+            <a href="#">
+                <img src="/img/menu.png">
+                <span>Menu</span>
             </a>
         </div>
     </div>
+
+    <div class="grid-cell grid-cell-menu " onclick="speakIa()">
+        <div class="containerImage">
+            <img src="/img/speaker.png">
+            <span>Speak IA</span>
+        </div>
+    </div>
+
+    <div class="grid-cell grid-cell-menu grid-cell-input">
+        <div class="" id="listWord">
+            {% include('/index/listWord.html.twig') %}
+        </div>
+    </div>
+
     <div class="grid-cell grid-cell-menu displayEditor"  >
         <div class="containerImage">
             <img src="/img/histoire.png">
@@ -17,27 +29,21 @@
         </div>
     </div>
 
-    <div class="grid-cell grid-cell-menu grid-cell-input">
+    {#    <div class="grid-cell grid-cell-menu " >#}
+{#        <div class="containerImage">#}
+{#            <a#}
+{#                    onclick="window.print();"#}
+{#                    href="/pictoPrinter?id=2"#}
+{#            >#}
+{#                <img src="/img/imprimante.png">#}
+{#                <span>Printer</span>#}
+{#            </a>#}
+{#        </div>#}
+{#    </div>#}
+    <div class="grid-cell grid-cell-menu " onclick="cleanTxt()">
         <div class="containerImage">
-
-        </div>
-    </div>
-
-    <div class="grid-cell grid-cell-menu " >
-        <div class="containerImage">
-            <a href="/pictoPrinter?id=2">
-                <img src="/img/imprimante.png">
-                <span>Printer</span>
-            </a>
-        </div>
-    </div>
-
-    <div class="grid-cell grid-cell-menu grid-cell-menu-setting" >
-        <div class="containerImage">
-            <a href="/pageEditor?id=2">
-                <img src="/img/setting.png">
-                <span>Setting</span>
-            </a>
+            <img src="/img/delete.png">
+            <span>Clear</span>
         </div>
     </div>
 </div>

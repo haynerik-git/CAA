@@ -4,6 +4,7 @@
 {% endif %}
 <div class="grid-cell
 {{ sizeCellClass }}"
+
     {% if deleteId is defined %}
         data-id="{{ deleteId }}"
     {% endif %}
@@ -27,6 +28,9 @@
                 data-id="{{ editId }}"
                 data-title="{{ word.name() }}"
                 data-src="{{ asset('images/' ~ word.filename) }}"
+                {% if  word.getType() is not null %}
+                    data-config="{{  word.getType().getId() }}"
+                {% endif %}
                 {% for lang in langs %}
                     data-title{{ lang.name }}="{{ word.getWordTranslationsByLang(lang.id) }}"
                 {% endfor %}
@@ -66,9 +70,15 @@
                 </span>
         </button>
     {% endif %}
-    <div class="containerImage">
+    <div class="containerImage"
+         style="background:
+         {% if word.getType() is not null %}
+                {{ word.getType().color }};
+         {% endif %}"
+    >
         <img class="imgPrint zoom"  src="{{ asset('images/' ~ word.filename) }}" alt="{{ word.name }}" >
         <span>{{ word.getWordTranslationsByLang(app.session.get('lang')) }}</span>
     </div>
 {#    <input type="text" class="description" value="{{ word.getWordTranslationsByLang(app.session.get('lang'))  }}"></input>#}
 </div>
+

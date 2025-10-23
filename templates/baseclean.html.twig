@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Welcome!{% endblock %}</title>
+    <title></title>
 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no">
@@ -25,6 +25,58 @@
     let selectedWord = [];
     let selectedCategories = [];
     let history = [];
+
+    $(document).on("click", "#goHome", function(ev) {
+
+        ev.preventDefault()
+        var param = {
+            'clean':true,
+            'ajax': true
+        }
+
+        $.ajax({
+            url: '/',
+            type: 'POST',
+            data: JSON.stringify(param),
+            async: false,
+            dataType: 'html',
+            cache: true
+        }).done(function (data) {
+            rows = data;
+            $("#hotPart").html(data);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            rows = '';
+        });
+
+    });
+
+    $(document).on("click", ".pageLink", function(ev) {
+
+        ev.preventDefault()
+        $('.categories-container').show();
+        $('.word-container').hide();
+        // alert()
+        var param = {
+            'prevPage':$(this).attr('data-prevPage'),
+            'ajax': true
+        }
+
+        if($(this).attr('data-id') !== undefined) {
+            $.ajax({
+                url: '/pageAjax/' + $(this).attr('data-id'),
+                type: 'POST',
+                data: JSON.stringify(param),
+                async: false,
+                dataType: 'html',
+                cache: true
+            }).done(function (data) {
+                rows = data;
+                $("#hotPart").html(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                rows = '';
+            });
+        }
+    });
 
 
     $(document).on("click", ".licatList2", function() {
@@ -57,14 +109,35 @@
     function cleanTxt() {
 
         $('#loader-wrapper').fadeIn(300)
-        $('#txt').val('');
-        history = []
-        $( "#allowmultiple" ).prop( "checked", false );
-        $(".image-checkbox").removeClass('image-checkbox-checked')
-        $(".continue").fadeOut(500)
-        actionCategorie(1,'home')
+        $('#listWord').html('');
 
-        $('#loader-wrapper').fadeOut(300)
+        history = []
+
+        var param = {
+            'clean':true,
+        }
+
+        $.ajax({
+            url: '/listWord',
+            type: 'POST',
+            data: JSON.stringify(param),
+            async: false,
+            dataType: 'html'
+        }).done(function (data) {
+            rows = data;
+            $("#listWord").html(data);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            rows = '';
+        });
+
+
+
+
+        // $( "#allowmultiple" ).prop( "checked", false );
+        // $(".image-checkbox").removeClass('image-checkbox-checked')
+        // $(".continue").fadeOut(500)
+        // actionCategorie(1,'home')
+        // $('#loader-wrapper').fadeOut(300)
     }
 
     function continueTxt() {
@@ -149,7 +222,9 @@
                 text = text + ' ' + word.name
         });
         $('#txt').val( text )
-     //   $('#breadcrumb').html( text )
+       // $('#breadcrumb').html( text )
+
+
 
     }
 
@@ -208,18 +283,25 @@
 
     function actionWord(id, description, categorieId = 0,level= 1, type = "word", redirectOnly = false, onlyToggle = false) {
 
-        $(this).addClass('active')
         // $(this).addClass('active')
+        var $rows = $('[data-wordid="'+ id+'"]').toggleClass('active')
 
-        $('#loader-wrapper').fadeIn(10).fadeOut(10)
+        setTimeout(function() {
+            $rows.removeClass("active");
+        }, 500);
+
+        // console.log($('[data-wordid="'+ id+'"]').data('wordimg'))
+
+        // $('#loader-wrapper').fadeIn(10).fadeOut(10)
         var lastWord=id;
         var lastCategorie=categorieId;
 
 
         // if( $('#speakOnClick').is(':checked') ) {
-        {% if page is defined and page.autoSpeak == true %}
+{#        {% if page is defined and page is not null and page.autoSpeak == true %}#}
             speak(description)
-        {% endif %}
+
+{#        {% endif %}#}
         // }
 
         if (type == "word" && !redirectOnly) {
@@ -227,9 +309,16 @@
                 'id':id,
                 'type': 'word',
                 'name': description,
-                'categorieId': categorieId
+                'categorieId': categorieId,
+                'img': $('[data-wordid="'+ id+'"]').data('wordimg')
             })
-            lastWord = id;
+            lastWord = [{
+                'id':id,
+                'type': 'word',
+                'name': description,
+                'categorieId': categorieId,
+                'img': $('[data-wordid="'+ id+'"]').data('wordimg')
+            }];
             // const nameComparator = (a, b) => a.name === b.name;
 
             history =toggleValueInArray(history,               {
@@ -237,16 +326,41 @@
                 'type': 'word',
                 'name': description,
                 'categorieId': categorieId
+
             });
         }
+        // updateInput()
 
-console.log(history)
-        updateInput()
+// console.log(history)
+
         if ( onlyToggle || $('#allowmultiple').is(':checked')) {
             $('#loader-wrapper').fadeOut()
             return
 
         }
+
+        var param = {
+            lastWord: lastWord,
+            lastCategorie:lastCategorie,
+            word : selectedWord,
+            categorie : selectedCategories,
+            level : level + 1
+        }
+
+        $.ajax({
+            url: '/listWord',
+            type: 'POST',
+            data: JSON.stringify(param),
+            async: true,
+            dataType: 'html'
+        }).done(function (data) {
+            rows = data;
+            $("#listWord").html(data);
+            animateAddToCard(id);
+            // $('[data-wordid="'+ id+'"]').delay(1000).toggleClass('active')
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            rows = '';
+        });
         // $( ".continue").fadeOut(10)
         // var param = {
         //     lastWord: lastWord,
@@ -273,6 +387,108 @@ console.log(history)
 
 
     }
+
+    function animateAddToCard(id) {
+        var cart = $('#listWord');
+        var imgtodrag = $('.categories-container [data-wordid="'+ id+'"]').find("img").eq(0);
+        if (imgtodrag) {
+            // var imgclone = imgtodrag.clone()
+            //     .offset({
+            //         top: imgtodrag.offset().top,
+            //         left: imgtodrag.offset().left
+            //     })
+            //     .css({
+            //         'opacity': '0.5',
+            //         'position': 'absolute',
+            //         'height': '150px',
+            //         'width': '150px',
+            //         'z-index': '100'
+            //     })
+            //     .appendTo($('body'))
+            //     .animate({
+            //         'top': cart.offset().top + 10,
+            //         'left': cart.offset().left + 10,
+            //         'width': 75,
+            //         'height': 75
+            //     }, 500)
+            //     .animate({
+            //         'width': 0,
+            //         'height': 0
+            //     }, function () {
+            //         $(this).detach()
+            //     });
+            //
+            // let width = cart.find('.owl-carousel-words').eq(0).outerWidth()
+            // // cart.find('.owl-carousel-words').eq(0).animate({
+            // //     scrollLeft:  width
+            // // }, 1000)
+            // cart.find('.owl-carousel-words').eq(0).animate({ scrollLeft: 999999 }, 900);
+            // console.log(width)
+            //
+            setTimeout(function () {
+                cart.find('.owl-carousel-words').eq(0).scrollLeft(999999);
+                console.log(cart.find('.owl-carousel-words').eq(0))
+            }, 50);
+
+            // imgclone;
+        }
+
+    }
+
+    function removeWord(id, description, categorieId = 0,level= 1, type = "word", redirectOnly = false, onlyToggle = false) {
+
+        $(this).addClass('active')
+
+        console.log($('[data-wordid="'+ id+'"]').data('wordimg'))
+
+        // $('#loader-wrapper').fadeIn(10).fadeOut(10)
+        var lastWord=id;
+        var lastCategorie=categorieId;
+
+
+
+        // }
+
+        if (type == "word" && !redirectOnly) {
+            selectedWord.splice(id -1 , 1);
+            lastWord = id;
+            // const nameComparator = (a, b) => a.name === b.name;
+
+            // history =toggleValueInArray(history,               {
+            //     'id':id,
+            //     'type': 'word',
+            //     'name': description,
+            //     'categorieId': categorieId
+            //
+            // });
+        }
+
+        var param = {
+            lastWord: lastWord,
+            lastCategorie:lastCategorie,
+            word : selectedWord,
+            categorie : selectedCategories,
+            level : level + 1,
+            removeWord: id,
+        }
+
+        $.ajax({
+            url: '/listWord',
+            type: 'POST',
+            data: JSON.stringify(param),
+            async: false,
+            dataType: 'html'
+        }).done(function (data) {
+            rows = data;
+            $("#listWord").html(data);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            rows = '';
+        });
+
+
+
+    }
+
     const idComparator = (a, b) => a === b;
     const toggleElement = (arr, val, compFn = idComparator) => {
         const res = arr.filter(v => !compFn(v, val));
@@ -282,8 +498,8 @@ console.log(history)
 
 
     function toggleValueInArray(array, value) {
-        var index = array.findIndex(p => p.id == value.id);
-
+        var index = array.findLastIndex(p => p.id == value.id);
+console.log('index' + index + '  id ' +  value.id)
         if (index === -1) {
             array.push(value);
         } else {
@@ -375,7 +591,7 @@ console.log(history)
 
 
             try{
-                speak(data);
+                speak(data,true);
             }
             catch (e) {
                 console.log(e); // Logs the error
@@ -389,7 +605,7 @@ console.log(history)
     }
 
 
-    function speak( inputTxt = null ) {
+    function speak( inputTxt = null, save = false ) {
         // if (synth.speaking) {
         //     alert("pas la")
         //     console.error("speechSynthesis.speaking");
@@ -400,11 +616,14 @@ console.log(history)
         if (inputTxt == null)
             inputTxt = $(document).find("#txt").val();
 
+        language = $(document).find("#lang").val();
+console.log(language)
+        // console.log(selectedWord)
 {#        {% if page is defined and page.autoSpeak == true %}#}
             try {
-                Android.showToast(inputTxt);
+                Android.showToast(inputTxt, parseInt(language));
                 // sendDataToAndroid(data.replace(/\s+/g, ' ').trim())
-                $('#loader-wrapper').fadeOut(300)
+                // $('#loader-wrapper').fadeOut(300)
             } catch (e) {
                 console.log(e); // Logs the error
             }
@@ -486,6 +705,23 @@ console.log(history)
             }
         } catch (e) {
             console.log(e); // Logs the error
+        }
+
+        if(save) {
+            // var param = {
+            //     lang: item.value,
+            // }
+            $.ajax({
+                url: '/saveWords',
+                type: 'POST',
+                // data: JSON.stringify(param),
+                async: true,
+                dataType: 'html'
+            }).done(function (data) {
+                // location.reload();
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                rows = '';
+            });
         }
     }
     // Creer un objet de sintetisation vocale
@@ -593,11 +829,56 @@ console.log(history)
     // });
 
     $('body').on('contextmenu', '#body', function(e) {
+        console.log('body')
         return false;
     });
 
     $('body').on('contextmenu', '#loader-wrapper', function(e) {
         return false;
+    });
+
+    $('body').on('contextmenu', '.pageLink', function(e){
+        // console.log($(e.target))
+        console.log(e)
+        let target;
+
+        $(e.currentTarget).click()
+        e.stopPropagation();
+        //
+        return false
+    });
+
+    $('body').on('contextmenu', '.page-link', function(e){
+        // console.log($(e.target))
+        console.log(e)
+        let target;
+
+        $(e.currentTarget).click()
+        e.stopPropagation();
+        //
+        return false
+    });
+
+    $('body').on('contextmenu', '.menu-btn', function(e){
+        // console.log($(e.target))
+        console.log(e)
+        let target;
+
+        $(e.currentTarget).click()
+        e.stopPropagation();
+        //
+        return false
+    });
+
+    $('body').on('contextmenu', '.grid-cell', function(e){
+        // console.log($(e.target))
+        console.log(e)
+        let target;
+
+        $(e.currentTarget).click()
+        e.stopPropagation();
+        //
+        return false
     });
 
     $('body').on('contextmenu', '.sentence', function(e){
@@ -613,6 +894,8 @@ console.log(history)
 
     $('body').on('contextmenu', '.cell', function(e){
         console.log($(e.target))
+        console.log('icicii')
+
         let target;
         if($(e.target).hasClass('image-checkbox')){
             // The target element is not a .tiny div
@@ -1031,16 +1314,9 @@ console.log(history)
     </div>
 
 
-    <div style="display: none;" data-role="panel" data-position="right" data-display="push" id="add-form">
+    <div style="display:none;" data-role="panel" data-position="right" data-display="push" id="add-form">
         <form>
-            <label for="lang">Choise you language {{ app.session.get('lang') }}:</label>
-            <select class="" id="lang"  onchange="setLang(this);">
-                <option {% if ( app.session.get('lang') == 2) %}selected{% endif %} value="2">es</option>
-                <option {% if ( app.session.get('lang') == 1) %}selected{% endif %} value="1">fr</option>
-                <option {% if ( app.session.get('lang') == 4) %}selected{% endif %} value="4">cat</option>
-                <option {% if ( app.session.get('lang') == 3) %}selected{% endif %} value="3">en</option>
-                <option {% if ( app.session.get('lang') == 5) %}selected{% endif %} value="5">de</option>
-            </select>
+
 
 
             <label for="speakOnClick">Speak on touch :</label>
@@ -1057,6 +1333,183 @@ console.log(history)
     </div>
 
 
+
+<nav class="notPrint">
+    <div class="menu-btn">
+        <div class="line line--1"></div>
+        <div class="line line--2"></div>
+        <div class="line line--3"></div>
+    </div>
+
+    <div class="nav-links">
+
+
+
+        <a href="/" id="goHome" class="link">Home</a>
+        <a href="/RenderSaveWords" class="link">Historique</a>
+        <a onclick="window.print();" class="link">Print</a>
+        <a href="/import" class="link">Import Arasac</a>
+        <a href="/app-debug.apk" class="link">Android APP</a>
+{#        <a href="/Pref" class="link">Preference</a>#}
+
+        <label for="lang" class="link">Choise you language {{ app.session.get('lang') }}:</label>
+        <select class="" id="lang"  onchange="setLang(this);">
+            <option {% if ( app.session.get('lang') == 2) %}selected{% endif %} value="2">es</option>
+            <option {% if ( app.session.get('lang') == 1) %}selected{% endif %} value="1">fr</option>
+            <option {% if ( app.session.get('lang') == 4) %}selected{% endif %} value="4">cat</option>
+            <option {% if ( app.session.get('lang') == 3) %}selected{% endif %} value="3">en</option>
+            <option {% if ( app.session.get('lang') == 5) %}selected{% endif %} value="5">de</option>
+        </select>
+{#        <a href="" class="link">Import Arasac</a>#}
+
+
+        <a href="/logout" class="link">Deco</a>
+    </div>
+</nav>
+
+
+<style>
+
+    nav {
+        /*overflow: hidden;*/
+        position: absolute;
+        transform: translateX(-400px);
+        top: 0;
+        height: 100%;
+        width: 400px;
+        transition: all 800ms cubic-bezier(.8, 0, .33, 1);
+        border-radius: 0% 0% 100% 50%;
+        z-index: 99;
+    }
+
+    nav.nav-open {
+        transform: translateX(0px);
+        border-radius: 0% 0% 0% 0%;
+        background: rgba(255, 255, 255, 1);
+    }
+
+    nav .menu-btn {
+        position: absolute;
+        top: 5%;
+        right: 5%;
+        padding: 0;
+        width: 30px;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    nav .menu-btn .line {
+        padding: 0;
+        width: 30px;
+        background: #fff;
+        height: 2px;
+        margin: 5px 0;
+        transition: all 700ms cubic-bezier(.9, 0, .33, 1);
+    }
+
+    nav .menu-btn .line.line--1 {
+        width: 30px;
+        transform: rotate(0) translateY(0);
+    }
+
+    nav .menu-btn .line.line--1.line-cross {
+        width: 30px;
+        transform: rotate(45deg) translateY(10px);
+        background: rgba(0,0,0,0.6);
+    }
+
+    nav .menu-btn .line.line--2 {
+        width: 28px;
+        transform: translateX(0);
+    }
+
+    nav .menu-btn .line.line--2.line-fade-out {
+        width: 28px;
+        transform: translate(30px);
+        opacity: 0;
+    }
+
+    nav .menu-btn .line.line--3 {
+        width: 20px;
+        transform: rotate(0) translateY(0);
+    }
+
+    nav .menu-btn .line.line--3.line-cross {
+        width: 30px;
+        transform: rotate(-45deg) translateY(-10px);
+        background: rgba(0,0,0,0.6);
+    }
+
+    nav .nav-links {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transform: translateX(-100px);
+        opacity: 0;
+        transition: all 900ms cubic-bezier(.9, 0, .33, 1);
+    }
+
+    nav .nav-links.fade-in {
+        opacity: 1;
+        transform: translateX(0px);
+    }
+
+    nav .nav-links .link {
+        margin: 20px 0;
+        text-decoration: none;
+        font-family: sans-serif;
+        color: rgba(0,0,0,0.9);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 1.2rem;
+        transition: all 300ms cubic-bezier(.9, 0, .33, 1);
+    }
+
+    nav .nav-links .link:hover {
+        color: rgba(0, 0, 0, .5);
+    }
+</style>
+
+
+<script>
+    var menuBtn = document.querySelector('nav .menu-btn');
+    var menuMenuBtn = document.querySelector('.grid-container-menu .menu-btn');
+    var nav = document.querySelector('nav');
+    var lineOne = document.querySelector('nav .menu-btn .line--1');
+    var lineTwo = document.querySelector('nav .menu-btn .line--2');
+    var lineThree = document.querySelector('nav .menu-btn .line--3');
+    var link = document.querySelector('nav .nav-links');
+    menuBtn.addEventListener('click', () => {
+        nav.classList.toggle('nav-open');
+        lineOne.classList.toggle('line-cross');
+        lineTwo.classList.toggle('line-fade-out');
+        lineThree.classList.toggle('line-cross');
+        link.classList.toggle('fade-in');
+    })
+    // menuMenuBtn.addEventListener('click', () => {
+    //     nav.classList.toggle('nav-open');
+    //     lineOne.classList.toggle('line-cross');
+    //     lineTwo.classList.toggle('line-fade-out');
+    //     lineThree.classList.toggle('line-cross');
+    //     link.classList.toggle('fade-in');
+    // })
+
+
+    $(document).on("click", ".grid-container-menu .menu-btn", function(ev) {
+
+        nav.classList.toggle('nav-open');
+        lineOne.classList.toggle('line-cross');
+        lineTwo.classList.toggle('line-fade-out');
+        lineThree.classList.toggle('line-cross');
+        link.classList.toggle('fade-in');
+    });
+</script>
 
 {#<div id="loader-wrapper">#}
 {#    <div id="loader"></div>#}

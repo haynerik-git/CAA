@@ -1,0 +1,32 @@
+<div class="grid-container-2x2 searchResult-container">
+    {% set addId = 1 %}
+    {% include('/index/part/emptyEdit.html.twig') %}
+
+    <h3 class="flexFull">Pages</h3>
+    {% for page in pages %}
+        {% set addId = page.id %}
+        {% set editId = page.id %}
+        {% include('/index/part/pageEdit.html.twig') %}
+    {% endfor %}
+
+    <h3 class="flexFull">Categorie</h3>
+    {% for cat in cats %}
+        {% set addId = cat.id %}
+        {% set editId = cat.id %}
+        {% include('/index/part/categorieEdit.html.twig') %}
+    {% endfor %}
+
+    <h3 class="flexFull">Words</h3>
+    {% for word in words %}
+        {% set addId = word.id %}
+        {% set editId = word.id %}
+
+        {% include('/index/part/wordEdit.html.twig') %}
+    {% endfor %}
+    <h3 class="flexFull">Sentence</h3>
+    {% for sentence in sentences %}
+        {% set addId = sentence.id %}
+        {% set editId = sentence.id %}
+        {% include('/index/part/sentenceEdit.html.twig') %}
+    {% endfor %}
+</div>

@@ -1,16 +1,25 @@
-{% set action = "actionWord" %}
-
+{#{% set action = "actionWord" %}#}
+{% set sentence = sentence ~ ' ' ~ word.getWordTranslationsByLang(app.session.get('lang'))  %}
 <div class="box cell image-checkbox"
-     onclick='{{ action }}("{{ word.id }}", "{{ word.getWordTranslationsByLang(app.session.get('lang')) }}", {{ cat.id }}, 1);
+     onclick='{{ action }}("{{ loop.index }}", "{{ word.getWordTranslationsByLang(app.session.get('lang')) }}", {{ cat.id }}, 1);
              $(this).toggleClass("image-checkbox-checked")
              '
      data-wordId="{{ word.id }}"
      data-wordName="{{ word.getWordTranslationsByLang(app.session.get('lang')) }}"
      data-catId="{{ cat.id }}"
+    >
 
->
-    <i class="material-icons">select_check_box</i>
-    <img su-media-id="{{ word.name }}"  src="{{ asset('images/' ~ word.filename) }}" alt="{{ word.name }}" style="">
-    <span>{{ word.getWordTranslationsByLang(app.session.get('lang')) }}</span>
+    <div class="containerImage" style="background:
+    {% if word.getType() is not null %}
+                {{ word.getType().color }};
+    {% endif %}">
+        <img src="{{ asset('images/' ~ word.filename) }}" style="max-height:13.5vh"/>
+        <span>
+            {{ word.getWordTranslationsByLang(app.session.get('lang')) }}
+        </span>
+    </div>
+{#    <i class="material-icons">select_check_box</i>#}
+{#    <img su-media-id="{{ word.name }}"  src="{{ asset('images/' ~ word.filename) }}" alt="{{ word.name }}" style="width: 30px;">#}
+{#    <span>{{ word.getWordTranslationsByLang(app.session.get('lang')) }}</span>#}
 </div>
 

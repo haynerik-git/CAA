@@ -53,6 +53,9 @@ class PageOrder
     #[ORM\Column(nullable: true)]
     private ?bool $hidden = null;
 
+    #[ORM\ManyToOne(inversedBy: 'pagePictoOrders')]
+    private ?Page $pagePicto = null;
+
 
     public function getId(): ?int
     {
@@ -211,6 +214,18 @@ class PageOrder
     public function setHidden(?bool $hidden): static
     {
         $this->hidden = $hidden;
+
+        return $this;
+    }
+
+    public function getPagePicto(): ?Page
+    {
+        return $this->pagePicto;
+    }
+
+    public function setPagePicto(?Page $pagePicto): static
+    {
+        $this->pagePicto = $pagePicto;
 
         return $this;
     }

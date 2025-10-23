@@ -55,9 +55,26 @@ class Page
     #[ORM\Column]
     private ?bool $autoSpeak = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $displayOrder = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $backgroundCard = null;
+
+    #[ORM\OneToMany(targetEntity: PageTranslation::class, mappedBy: 'page')]
+    private Collection $pageTranslations;
+
+    #[ORM\OneToMany(targetEntity: PageOrder::class, mappedBy: 'pagePicto')]
+    private Collection $pagePictoOrders;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $visible = null;
+
     public function __construct()
     {
         $this->pageOrders = new ArrayCollection();
+        $this->pageTranslations = new ArrayCollection();
+        $this->pagePictoOrders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -243,4 +260,113 @@ class Page
 
         return $this;
     }
+
+    public function getDisplayOrder(): ?int
+    {
+        return $this->displayOrder;
+    }
+
+    public function setDisplayOrder(?int $displayOrder): static
+    {
+        $this->displayOrder = $displayOrder;
+
+        return $this;
+    }
+
+    public function getBackgroundCard(): ?string
+    {
+        return $this->backgroundCard;
+    }
+
+    public function setBackgroundCard(?string $backgroundCard): static
+    {
+        $this->backgroundCard = $backgroundCard;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PageTranslation>
+     */
+    public function getPageTranslations(): Collection
+    {
+        return $this->pageTranslations;
+    }
+
+    public function addPageTranslation(PageTranslation $pageTranslation): static
+    {
+        if (!$this->pageTranslations->contains($pageTranslation)) {
+            $this->pageTranslations->add($pageTranslation);
+            $pageTranslation->setPage($this);
+        }
+
+        return $this;
+    }
+
+    public function removePageTranslation(PageTranslation $pageTranslation): static
+    {
+        if ($this->pageTranslations->removeElement($pageTranslation)) {
+            // set the owning side to null (unless already changed)
+            if ($pageTranslation->getPage() === $this) {
+                $pageTranslation->setPage(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getTranslationsByLang(string $lang): string
+    {
+        $langId = (int)$lang;
+        $res = $this->getPageTranslations()->filter(function(PageTranslation $wordsTranslations) use ($langId) {
+            return $wordsTranslations->getLang()->getId() == $langId;
+        });
+        foreach ($res as $wordTranslation) {
+            return $wordTranslation->getName();
+        }
+        return $this->title;
+    }
+
+    /**
+     * @return Collection<int, PageOrder>
+     */
+    public function getPagePictoOrders(): Collection
+    {
+        return $this->pagePictoOrders;
+    }
+
+    public function addPagePictoOrder(PageOrder $pagePictoOrder): static
+    {
+        if (!$this->pagePictoOrders->contains($pagePictoOrder)) {
+            $this->pagePictoOrders->add($pagePictoOrder);
+            $pagePictoOrder->setPagePicto($this);
+        }
+
+        return $this;
+    }
+
+    public function removePagePictoOrder(PageOrder $pagePictoOrder): static
+    {
+        if ($this->pagePictoOrders->removeElement($pagePictoOrder)) {
+            // set the owning side to null (unless already changed)
+            if ($pagePictoOrder->getPagePicto() === $this) {
+                $pagePictoOrder->setPagePicto(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isVisible(): ?bool
+    {
+        return $this->visible;
+    }
+
+    public function setVisible(?bool $visible): static
+    {
+        $this->visible = $visible;
+
+        return $this;
+    }
+
 }

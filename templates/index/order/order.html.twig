@@ -35,6 +35,23 @@
                             folder_open
                         </span>
         </div>
+    {% elseif pageOrder.type == 'page'  %}
+
+        <div class="grid-cell {{ sizeCellClass }} pageLink" data-id="{{ pageOrder.getPagePicto().id }}" data-prevPage="{{ page.id }}" >
+            <div class="containerImage"
+                 style="
+                    background:
+            {% if pageOrder.getPagePicto().getBackgroundCell() is not null %}
+                {{ pageOrder.getPagePicto().getBackgroundCell() }};
+            {% endif %}"
+                    >
+                <img src="{{ asset('/images/' ~ pageOrder.getPagePicto().filename) }}" />
+                <span class="text-overlay"> {{ pageOrder.getPagePicto().getTranslationsByLang(app.session.get('lang'))|capitalize }}</span>
+            </div>
+            <span class="material-icons folder">
+                            folder_open
+                        </span>
+        </div>
     {% elseif pageOrder.type == 'input' %}
         <div class="grid-cell {{ sizeCellClass }}">
             <div class="containerImage">
@@ -44,17 +61,21 @@
     {% elseif pageOrder.type == 'word' %}
         <div class="grid-cell {{ sizeCellClass }}"
              onclick='actionWord("{{ pageOrder.getWord().id }}", "{{ pageOrder.getWord().getWordTranslationsByLang(app.session.get('lang')) }}", {{ pageOrder.getWord().id }}, 1);
-                     $(this).toggleClass("image-checkbox-checked")
+
                      '
              data-wordId="{{ pageOrder.getWord().id }}"
+             data-wordImg="{{ pageOrder.getWord().filename }}"
              data-wordName="{{ pageOrder.getWord().getWordTranslationsByLang(app.session.get('lang')) }}"
              data-catId="{{ pageOrder.getWord().id }}"
         >
-            <div class="containerImage" style="background:
-            {% if pageOrder.getWord().getType() is not null %}
-                {{ pageOrder.getWord().getType().color }};
-            {% endif %}">
+            <div class="containerImage"
+                 style="background:
+                {% if pageOrder.getWord().getType() is not null %}
+                    {{ pageOrder.getWord().getType().color }};
+                {% endif %}"
+            >
                 <img src="{{ asset('images/' ~ pageOrder.getWord().filename) }}" />
+
                 <span>{{ pageOrder.getWord().getWordTranslationsByLang(app.session.get('lang')) }}
 
                 </span>
@@ -85,7 +106,12 @@
         <div class="grid-cell {{ sizeCellClass }}"
              onclick='selectCombination({{ pageOrder.getSentence().id }})'
         >
-            <div class="containerImage">
+            <div class="containerImage"
+{#                 style="background:#}
+{#                 {% if pageOrder.getSentence().getType() is not null %}#}
+{#                    {{ pageOrder.getSentence().getType().color }};#}
+{#                 {% endif %}"#}
+            >
                 <img src="{{ asset('images/' ~ pageOrder.getSentence().filename) }}" />
                 <span>{{ pageOrder.getSentence().getSentenceTranslationsByLang(app.session.get('lang')) }}</span>
             </div>
@@ -98,9 +124,32 @@
 {% endfor %}
 
 
-<div id="categorie-pagination-container">
+<div id="categorie-pagination-container" class="notPrint">
     <div></div>
 </div>
+
+
+<div id="page-pagination-container" class="paginationPage notPrint light-theme simple-pagination">
+    <div>
+        <div>
+           {% if prevPage is not null %}
+                <span data-id="{{ prevPage.id }}" class="current prev pageLink">
+                            <img src="{{ asset('images/' ~ prevPage.filename) }}" style="width: 100px"/>
+{#                    <span class="vericaltext">{{ prevPage.title }}</span>#}
+{#                    &lt;#}
+                </span>
+            {% endif %}
+            {% if nextPage is not null %}
+                 <span data-id="{{ nextPage.id }}"  class=" pageLink current next">
+                <img src="{{ asset('images/' ~ nextPage.filename) }}" style="width: 100px"/>
+{#                    &gt;#}
+                 </span>
+            {% endif %}
+        </div>
+        <div class="disabled"><span class="current next">&gt;</span></div>
+    </div>
+</div>
+
 <script>
 
     // Requires jQuery

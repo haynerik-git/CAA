@@ -17,6 +17,7 @@ class SpeakerController extends AbstractController
             'controller_name' => 'SpeakerController',
         ]);
     }
+//speaker/contactIa
     #[Route('/speaker/contactIa', name: 'app_speaker_contact_ia')]
     public function contactIa(Request $request) : JsonResponse
     {
@@ -63,18 +64,35 @@ class SpeakerController extends AbstractController
         return $txt;
     }
 
-    #[Route('/speaker/contactIaRework', name: 'app_speaker_contact_ia')]
+    #[Route('/speaker/contactIaRework', name: 'app_speaker_contact_ia_rework')]
     public function contactIaRework(Request $request, SessionInterface $session) : JsonResponse
     {
         $t = $request->get('text');
 
         if($session->has('lang')) {
             $lang = $session->get('lang');
+            if($lang == "1") {
+                $langRequest = 'francais';
+            }
+            elseif ($lang == "2") {
+                $langRequest = 'espagnol';
+            }
+            elseif ($lang == "3") {
+                $langRequest = 'anglais';
+            }
+            elseif ($lang == "4") {
+                $langRequest = 'catalan';
+            }
+            elseif ($lang == "5") {
+                $langRequest = 'allemand';
+            }
         }
 
        // return new JsonResponse($t. ' ' . $lang, Response::HTTP_OK, [], true);
 
-        $text = 'Reformule cette phrase au present sans me proposer differente solution ( juste la phrase reformule ) en espagnol : '.$t;
+        $text = 'Reformule cette phrase au present sans me proposer differente solution ( juste la phrase reformule ) en ' . $langRequest . ' : '.$t;
+
+        $text = 'Reformule cette phrase au present sans me proposer differente solution ( juste la phrase reformule ) en ' . $langRequest . ' : '.$t;
 
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
@@ -82,7 +100,7 @@ class SpeakerController extends AbstractController
 // new key AIzaSyAjT2OnigsgwN96YFEECb-1EY5gVtA518Q
 
 
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCNAdh2cVyJAzUcaYzMFe9P2B6iZoTVirA';
+//        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=AIzaSyCNAdh2cVyJAzUcaYzMFe9P2B6iZoTVirA';
         $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyAjT2OnigsgwN96YFEECb-1EY5gVtA518Q';
 
         $data = array(

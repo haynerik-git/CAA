@@ -1,0 +1,50 @@
+{% extends 'baseclean.html.twig' %}
+
+{% block body %}
+    <style>
+        :root {
+            {#--column: {{ col }};#}
+            {#--row: {{ row }};#}
+            {#--background: {{ page.background }};#}
+            {#--backgroundCell: {{ page.backgroundCell }};#}
+            --backgroundTab: #000;
+            {#--border:{{ page.border }};#}
+            {#--colorDescription: {{ page.colorDescription }};#}
+            --tabsPosition:0;
+            --nbTabs: 7;
+            --colorTextTab: #fff;
+            --headerHeight:1.2cm;
+            --margeTop: 1.5cm;
+            {#--fontFamily:{{ page.font }};#}
+            --size: clamp(250px, 50vmin, 300px);
+            @media screen and (max-width: 640px) {
+                /*--column: 4;*/
+                /*--row: 4;*/
+            }
+        }
+
+        @media screen and (max-width: 640px) {
+            .empty {
+                /*display: none !important;*/
+            }
+        }
+
+
+
+    </style>
+{% set words = [] %}
+    <div id="hotPart">
+        {% include('/index/menu/menuHome.html.twig') %}
+        <div id="grid-container"  >
+            {% for words in wordsResult %}
+                {% for word in words %}
+                    {{ word.name }}
+                {% endfor %}
+<br>
+                {% include('/index/listWord.html.twig') %}
+                <br>
+                <hr>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

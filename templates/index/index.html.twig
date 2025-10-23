@@ -1,20 +1,30 @@
-{% extends 'baseclean.html.twig' %}
+{#{% if ajax != true %}#}
+{#    {% extends 'baseclean.html.twig' %}#}
+{#{% endif %}#}
+
+{% extends ajax != true ? 'baseclean.html.twig' : 'empty.html.twig' %}
 
 {% block body %}
-    {% include('/index/menu/menuHome.html.twig') %}
 
 
+    <div id='hotPart'>
 
-    <div class="grid-container word-container displayTabs" >
+{#        {% if ajax != true %}#}
+            {% include('/index/menu/menuHome.html.twig') %}
+{#        {% endif %}#}
+
+        <div class="grid-container word-container displayTabs" >
 {#        {% set orders = pageOrder.getUserCategories().getUserCategoriesOrders() %}#}
 {#        {% include('/index/order/order.html.twig') %}#}
-        {% for page in pages %}
-            <div class="grid-cell grid-cell-page">
+        {% for page in pages|sort((a, b) => a.getDisplayOrder() <=> b.getDisplayOrder())  %}
+            <div class="grid-cell grid-cell-page" >
 
-                    <div class="containerImage">
-                        <a href="/page/{{ page.id }}">
+                    <div class="containerImage" style="background: {{ page.backgroundCell }}">
+                        <a href="#"
+                           class="pageLink" data-id="{{ page.id }}"
+                        >
                             <img src="{{ asset('/images/' ~ page.filename) }}">
-                            <span>{{ page.title }}</span>
+                            <span>{{ page.getTranslationsByLang(app.session.get('lang'))|capitalize  }}</span>
                         </a>
                     </div>
 {#                </a>#}
@@ -33,32 +43,32 @@
                 </a>
             </div>
         {% endfor %}
-        <div id="pagination-container">
+        <div id="pagination-container" class="notPrint">
             <div></div>
         </div>
         <script>
 
-            $('body').on('contextmenu', '.containerImage', function(e){
-                console.log($(e.target))
-                let target;
-                if($(e.target).hasClass('image-checkbox')){
-                    // The target element is not a .tiny div
-                    target =  $(e.target)
-                }
-                else {
-                    // find closest
-                    var href = $(e.target).closest( "a" ).attr('href')
-                    window.location.href = href;
-                }
-                return false
-            });
+            // $('body').on('contextmenu', '.containerImage', function(e){
+            //     console.log($(e.target))
+            //     let target;
+            //     if($(e.target).hasClass('image-checkbox')){
+            //         // The target element is not a .tiny div
+            //         target =  $(e.target)
+            //     }
+            //     else {
+            //         // find closest
+            //         var href = $(e.target).closest( "a" ).attr('href')
+            //         window.location.href = href;
+            //     }
+            //     return false
+            // });
 
 
 
             $(document).ready(function() {
                 var items = $(".displayTabs .grid-cell");
                 var numItems = items.length;
-                var perPage = 6;
+                var perPage = 20;
                 items.slice(perPage).hide();
 
                 $('#pagination-container').pagination({
@@ -77,12 +87,13 @@
             })
         </script>
     </div>
+    </div>
 
     <style>
 
         :root {
-            --column:3;
-            --row: 2;
+            --column:5;
+            --row: 4;
             --background: #c3c3c3;
             --backgroundCell: white;
             --backgroundTab: #000;
@@ -94,13 +105,17 @@
             --headerHeight:1.2cm;
             --margeTop: 1.5cm;
             {#--fontFamily:{{ page.font }};#}
-            --size: clamp(250px, 50vmin);
+            --size: clamp(250px, 60vmin, 300px);
             @media screen and (max-width: 640px) {
                 /*--column: 4;*/
                 /*--row: 4;*/
             }
         }
-
+        .containerImage {
+            a:link, a:visited,a:hover, a:active {
+                color: black;
+            }
+        }
 
     </style>
 {% endblock %}

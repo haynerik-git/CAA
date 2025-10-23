@@ -1,0 +1,89 @@
+<div class="grid-cell "
+     style=""
+     {#        background:#}
+     {#{% if page.getType() is not null %}#}
+     {#           {{ page.getType().color }};#}
+     {#{% endif %}"#}
+        {% if deleteId is defined %}
+            data-id="{{ deleteId }}"
+        {% endif %}
+        {% if idpage is defined %}
+            data-pageId="{{ idpage }}"
+        {% endif %}
+
+        filter="{{ page.getTranslationsByLang(app.session.get('lang'))|lower  }}"
+        >
+            {% if deleteId is defined %}
+                <button id="page{{ deleteId }}" class="notPrint remove"
+                        onclick="removeItem(this,{{ deleteId }},'page')"
+                >
+                     <span class="material-icons">
+                        close
+                    </span>
+                </button>
+            {% endif %}
+            {% if editId is defined %}
+                <button id="page{{ editId }}" class="notPrint edit">
+                    <a
+                        href="/pageEditor?id={{ editId }}"
+                        data-id="{{ page.id }}"
+                        data-title="{{ page.title }}"
+{#                        {% if  page.getType() is not null %}#}
+{#                            data-config="{{  page.getType().getId() }}"#}
+{#                        {% endif %}#}
+                        data-src="{{ asset('images/' ~ page.filename) }}"
+                    >
+                        <span class="material-icons">
+                        edit
+                        </span>
+                    </a>
+                </button>
+{#                <button id="pageVIsible{{ page.id }}" class="notPrint gridManager "#}
+{#                        data-id="{{ page.id }}"#}
+{#                >#}
+{#                                                 <span class="material-icons">#}
+{#                                                    grid_view#}
+{#                                                </span>#}
+{#                </button>#}
+            {% endif %}
+            {% if addId is defined and addId != 0 %}
+                <button id="pageAdd{{ addId }}" class="notPrint add"
+                        onclick="addBlockWord( 'page' , {{ addId }})"
+                >
+                         <span class="material-icons">
+                            add
+                        </span>
+                </button>
+            {% endif %}
+
+            {% if hidden is defined %}
+                <button id="pageHide{{ hiddenId }}" class="notPrint visible
+                            {% if hidden %}
+                                visibility
+                             {% else %}
+                                visibility_off
+                             {% endif %}
+                             "
+                        onclick="hideItem(this,{{ hiddenId }})"
+                >
+                         <span class="material-icons visibility_icon
+                                visibility
+                        ">
+                                visibility
+                        </span>
+                    <span class="material-icons visibility_off_icon">
+                                 visibility_off
+                        </span>
+                </button>
+            {% endif %}
+    <div class="containerImage"
+         style="background:
+         {% if page.backgroundCell is not null %}
+             {{ page.backgroundCell }}
+         {% endif %}"
+    >
+        <img class="imgPrint zoom"  src="{{ asset('images/' ~ page.filename) }}" alt="{{ page.title }}" >
+        <span>{{ page.getTranslationsByLang(app.session.get('lang'))|capitalize }}</span>
+    </div>
+{#    <input type="text" class="description" value="{{ word.getWordTranslationsByLang(app.session.get('lang'))  }}"></input>#}
+</div>

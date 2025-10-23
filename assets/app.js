@@ -389,6 +389,8 @@
 })(jQuery);
 
 
+// speak('')
+
 $(document).on("click", ".displayEditor", function() {
     $('.editPage').show()
     $('.pagePrint').toggleClass('hide').show()
