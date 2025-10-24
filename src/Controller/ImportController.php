@@ -56,7 +56,7 @@ class ImportController extends AbstractController
         $langs = $langRepository->findAll();
         $updateTad = true;
 
-        $content = array_slice($content, 450);
+//        $content = array_slice($content, 450);
         $i = 0 ;
         foreach ($content as $item) {
             $wordsFind = [];

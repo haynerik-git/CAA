@@ -166,12 +166,19 @@ class IndexController extends AbstractController
         if(empty($wordsSession))
             $wordsSession = $words = [];
 
+        $lastIndex = array_key_last($post_data['lastWord']);
+        $wordsSession = array_merge($session->get('words'), array($post_data['lastWord'][$lastIndex]));
+
 //        dd($wordsSession);
         $cat = ["id"=>0];
         foreach ($wordsSession as $wordObj) {
-            $words[] =  $word->find($wordObj['id']);
-        }
+            if($wordObj['type'] == 'word' )
+                $words[] =  $word->find($wordObj['id']);
+            elseif ($wordObj['type'] == 'categorie' )
+                $words[] =  $page->find($wordObj['id']);
 
+        }
+//dd($words);
         return $this->render('index/pageAjax.html.twig', [
             'words' => $words,
             'cat' => $cat,

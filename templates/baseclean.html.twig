@@ -56,12 +56,26 @@
         $('.categories-container').show();
         $('.word-container').hide();
         // alert()
-        var param = {
-            'prevPage':$(this).attr('data-prevPage'),
-            'ajax': true
-        }
+
+
+
+
 
         if($(this).attr('data-id') !== undefined) {
+
+            lastWord = [{
+                'id':$(this).attr('data-id'),
+                'type': 'categorie',
+                'name': 'description',
+                'categorieId': 0,
+                // 'img': $('[data-wordid="'+ id+'"]').data('wordimg')
+            }];
+            var param = {
+                'prevPage':$(this).attr('data-prevPage'),
+                'ajax': true,
+                'lastWord': lastWord
+
+            }
             $.ajax({
                 url: '/pageAjax/' + $(this).attr('data-id'),
                 type: 'POST',
