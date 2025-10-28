@@ -66,11 +66,12 @@ class PageRepository extends ServiceEntityRepository
             ;
     }
 
-    public function search($value, $langId = 1): array
+    public function search($value, $userId,  $langId = 1): array
     {
-
-        return $this->createQueryBuilder('p')
+        $query = $this->createQueryBuilder('p')
+            ->join('p.user', 'user', 'WITH', 'p.user = '.$userId )
             ->leftJoin('p.pageTranslations', 'translation' ,'WITH', 'translation.lang = '.$langId )
+
             ->where('translation.name like  :searchterm')
             ->orWhere('p.title like  :searchterm')
 //            ->where('w.name = :searchterm')
@@ -78,8 +79,9 @@ class PageRepository extends ServiceEntityRepository
 
             ->orderBy("translation.name")
 //            ->orderBy("wl.name")
-            ->getQuery()
-            ->getResult()
+            ->getQuery();
+//        dd($query->getSQL());
+           return $query->getResult()
             ;
     }
 

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -28,7 +29,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    private ?array $roles = [];
+    private array $roles = [];
 
     /**
      * @var string The hashed password
@@ -251,6 +252,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->pages;
     }
+
+    public function getPagesVisibleHome()
+    {
+        return $this->getPages()->filter(function(Page $page) {
+            return $page->isVisible();
+        });
+    }
+
+
+    public function getPagesVisibleHomeCriteria()
+    {
+        $criteria = Criteria::create()
+            ->andWhere(Criteria::expr()->contains('visible', 1))
+            ->orderBy(['displayOrder' => 'ASC'])
+        ;
+        return $this->getPages()->matching($criteria);
+    }
+
 
     public function addPage(Page $page): static
     {

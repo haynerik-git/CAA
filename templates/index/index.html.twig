@@ -16,7 +16,7 @@
         <div class="grid-container word-container displayTabs" >
 {#        {% set orders = pageOrder.getUserCategories().getUserCategoriesOrders() %}#}
 {#        {% include('/index/order/order.html.twig') %}#}
-        {% for page in pages|sort((a, b) => a.getDisplayOrder() <=> b.getDisplayOrder())  %}
+        {% for page in pages  %}
             <div class="grid-cell grid-cell-page" >
 
                     <div class="containerImage" style="background: {{ page.backgroundCell }}">

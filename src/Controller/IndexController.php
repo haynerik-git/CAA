@@ -56,8 +56,9 @@ class IndexController extends AbstractController
 
 //dd($ajax);
 //        dd($post_data);
-        $res = $page->findPageByOrder();
-//        $res = $security->getUser()->getPages();
+//        $res = $page->findPageByOrder();
+        $res = $security->getUser()->getPagesVisibleHomeCriteria();
+
         $wordsSession = $session->get('words');
 //        dd($wordsSession);
 
@@ -501,7 +502,7 @@ class IndexController extends AbstractController
 
 
     #[Route('/pageEditor', name: 'pageEditor')]
-    public function pageOrderEditor(WordConfigurationRepository $configurationRepository, PageRepository $pageRepository,WordRepository $word, UserCategoriesRepository $userCategoriesRepository,SentencesRepository $sentencesRepository,LangRepository $langRepository,ActionRepository $actionRepository, SessionInterface $session,Request $request): Response
+    public function pageOrderEditor(Security $security,WordConfigurationRepository $configurationRepository, PageRepository $pageRepository,WordRepository $word, UserCategoriesRepository $userCategoriesRepository,SentencesRepository $sentencesRepository,LangRepository $langRepository,ActionRepository $actionRepository, SessionInterface $session,Request $request): Response
     {
         $id = $request->get('id');
 //        dd($cat);
@@ -509,15 +510,15 @@ class IndexController extends AbstractController
             $session->set('lang', 1);
 
         $res = $pageRepository->find($id);
-        $pages = $pageRepository->findAll();
+        $pages = $security->getUser()->getPages();
         $res2 = $res->getPageOrders();
         $wordsList = [];//$word->findBy([],['name' => 'ASC']);
-        $catsList = $userCategoriesRepository->findBy([],['label' => 'ASC']);
+        $catsList = [];// $userCategoriesRepository->findBy([],['label' => 'ASC']);
 //        $catsList =  $userCategoriesRepository->findBy([],['label' => 'ASC']);
         $sentencesList = [];//$sentencesRepository->findAll();
         $config = $configurationRepository->findAll();
         $langs = $langRepository->findAll();
-        $actions = $actionRepository->findAll();
+        $actions = [];//$actionRepository->findAll();
 
 //dd($res->getPageOrders());
         return $this->render('index/pageEditor.html.twig', [
@@ -547,12 +548,12 @@ class IndexController extends AbstractController
         $res = $pageRepository->find($id);
         $res2 = $res->getPageOrders();
         $wordsList = [];//$word->findBy([],['name' => 'ASC']);
-        $catsList = $userCategoriesRepository->findBy([],['label' => 'ASC']);
+        $catsList = [];//$userCategoriesRepository->findBy([],['label' => 'ASC']);
 //        $catsList =  $userCategoriesRepository->findBy([],['label' => 'ASC']);
         $sentencesList = [];//$sentencesRepository->findAll();
         $config = $configurationRepository->findAll();
         $langs = $langRepository->findAll();
-        $actions = $actionRepository->findAll();
+        $actions = [];//$actionRepository->findAll();
 
 //dd($res->getPageOrders());
         return $this->render('index/pageOrderEditor.html.twig', [
@@ -570,21 +571,21 @@ class IndexController extends AbstractController
     }
 
     #[Route('/searchResult', name: 'searchResult')]
-    public function searchResult(PageRepository $pageRepository,WordRepository $word, UserCategoriesRepository $userCategoriesRepository,SentencesRepository $sentencesRepository,LangRepository $langRepository,ActionRepository $actionRepository, SessionInterface $session,Request $request): Response
+    public function searchResult(Security $security,PageRepository $pageRepository,WordRepository $word, UserCategoriesRepository $userCategoriesRepository,SentencesRepository $sentencesRepository,LangRepository $langRepository,ActionRepository $actionRepository, SessionInterface $session,Request $request): Response
     {
         $search = $request->get('search');
 //        dd($search);
         if(!$session->has('lang'))
             $session->set('lang', 1);
-        $pages = $pageRepository->search($search, $session->get('lang'));
+        $pages = $pageRepository->search($search, $security->getUser()->getId(),  $session->get('lang'));
 //        $res = $pageRepository->find($id);
 //        $res2 = $res->getPageOrders();
-        $wordsList = $word->search($search, $session->get('lang'));
-        $catsList = $userCategoriesRepository->search($search);
+        $wordsList = $word->search($search,  $security->getUser()->getId(), $session->get('lang'));
+        $catsList = [];//$userCategoriesRepository->search($search);
 //        $catsList =  $userCategoriesRepository->findBy([],['label' => 'ASC']);
         $sentencesList = [];//$sentencesRepository->findAll();
         $langs = $langRepository->findAll();
-        $actions = $actionRepository->findAll();
+        $actions = [];//$actionRepository->findAll();
 
 
         return $this->render('index/part/searchResult.html.twig', [

@@ -34,13 +34,71 @@ class WordRepository extends ServiceEntityRepository
             ;
         }
 
-    public function search($value, $langId = 1): array
+    public function search($value, $userId,  $langId = 1): array
     {
 
-        return $this->createQueryBuilder('w')
-            ->leftJoin('w.wordTranslations', 'translation' ,'WITH', 'translation.lang = '.$langId )
-            ->where('translation.name like  :searchterm')
-            ->orWhere('w.name like  :searchterm')
+//        $entityManager = $this->getEntityManager();
+//
+//        $query = $entityManager->createQuery(
+//            'SELECT w
+//            FROM App\Entity\Word w
+//            LEFT JOIN App\Entity\PageTranslation ON App\Entity\Word.id = App\Entity\PageTranslation.pageId
+//            WHERE ( w.name LIKE :value and w.user = :userId )
+//            or ( w.name LIKE :value and w.user is null )
+//            ORDER BY w.name ASC'
+//
+//
+//        )->setParameters(['value' => "%$value%", 'userId' => $userId ]);
+//
+//        // returns an array of Product objects
+//        return $query->getResult();
+//
+//
+//        $conn = $this->getEntityManager()->getConnection();
+//
+//        $sql = '
+//            SELECT * FROM word w
+//            WHERE w.name LIKE :value
+//            ORDER BY w.name ASC
+//            ';
+//
+//        $resultSet = $conn->executeQuery($sql, ['value' => "%$value%"]);
+////
+//        // returns an array of arrays (i.e. a raw data set)
+//        return $resultSet->fetchAll();
+        $queryBuilder = $this->createQueryBuilder('w');
+//            ->Join('w.user', 'user', '', 'w.user = '.$userId )
+        return $queryBuilder->leftJoin('w.wordTranslations', 'translation' ,'WITH', 'translation.lang = '.$langId )
+//            ->where('translation.name like  :searchterm')
+
+            ->where(
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->eq('w.user', $userId),
+                    $queryBuilder->expr()->like('w.name', ':searchterm')
+                )
+            )
+
+            ->orWhere(
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->isNull('w.user'),
+                    $queryBuilder->expr()->like('w.name', ':searchterm')
+                )
+            )
+
+
+            ->orWhere(
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->isNull('w.user'),
+                    $queryBuilder->expr()->like('translation.name', ':searchterm'),
+                )
+            )
+
+            ->orWhere(
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->eq('w.user', $userId),
+                    $queryBuilder->expr()->like('translation.name', ':searchterm')
+                )
+            )
 //            ->where('w.name = :searchterm')
             ->setParameter('searchterm', '%'.$value.'%')
 
