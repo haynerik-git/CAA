@@ -50,16 +50,29 @@
 
     });
 
+    $(document).on("click", ".pageBackLink", function(ev) {
+        ev.preventDefault()
+
+        $.ajax({
+            url: '/pageBackAjax/' + $(this).attr('data-id'),
+            type: 'POST',
+            // data: JSON.stringify(param),
+            async: false,
+            dataType: 'html',
+            cache: true
+        }).done(function (data) {
+            rows = data;
+            $("#hotPart").html(data);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            rows = '';
+        });
+    })
+
     $(document).on("click", ".pageLink", function(ev) {
 
         ev.preventDefault()
         $('.categories-container').show();
         $('.word-container').hide();
-        // alert()
-
-
-
-
 
         if($(this).attr('data-id') !== undefined) {
 
@@ -74,8 +87,9 @@
                 'prevPage':$(this).attr('data-prevPage'),
                 'ajax': true,
                 'lastWord': lastWord
-
             }
+            if($(this).attr('data-description') !== undefined)
+            speak($(this).attr('data-description'))
             $.ajax({
                 url: '/pageAjax/' + $(this).attr('data-id'),
                 type: 'POST',
@@ -140,6 +154,25 @@
         }).done(function (data) {
             rows = data;
             $("#listWord").html(data);
+
+            var param = {
+                'clean':true,
+                'ajax': true
+            }
+
+            $.ajax({
+                url: '/',
+                type: 'POST',
+                data: JSON.stringify(param),
+                async: false,
+                dataType: 'html',
+                cache: true
+            }).done(function (data) {
+                rows = data;
+                $("#hotPart").html(data);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                rows = '';
+            });
         }).fail(function (jqXHR, textStatus, errorThrown) {
             rows = '';
         });

@@ -5,10 +5,17 @@
 {#    {{ words | length }}#}
     <div class='owl-carousel owl-theme owl-carousel-words' style="    display: -webkit-inline-box;overflow: scroll;">
         {% for word in words %}
-            {{ word.getClassName }}
+            {% if word.getClassName == 'Word' %}
 {#            <? echo get_class(word) ?>#}
-{#            {% include '/wordsSmall.html.twig' %}#}
-{#            {% set sentence = sentence ~ " " ~ word.getWordTranslationsByLang(app.session.get('lang'))  %}#}
+                {% include '/wordsSmall.html.twig' %}
+                {% set sentence = sentence ~ " " ~ word.getWordTranslationsByLang(app.session.get('lang'))  %}
+            {% elseif word.getClassName == 'Page' %}
+                {% if word.isAddHasWord %}
+                    {% include '/pageSmall.html.twig' %}
+{#                    {{ word.getTranslationsByLang(app.session.get('lang')) }}#}
+                    {% set sentence = sentence ~ " " ~ word.getTranslationsByLang(app.session.get('lang'))  %}
+                {% endif %}
+            {% endif %}
         {% endfor %}
     </div>
     <input type="text" id="txt" value="{{ sentence }}" style="display:none;"></input>

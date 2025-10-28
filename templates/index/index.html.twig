@@ -6,7 +6,7 @@
 
 {% block body %}
 
-
+{#{{ ajax }}#}
     <div id='hotPart'>
 
 {#        {% if ajax != true %}#}
@@ -22,6 +22,9 @@
                     <div class="containerImage" style="background: {{ page.backgroundCell }}">
                         <a href="#"
                            class="pageLink" data-id="{{ page.id }}"
+                           {% if page.isAddHasWord %}
+                                data-description="{{ page.getTranslationsByLang(app.session.get('lang')) }}"
+                           {% endif %}
                         >
                             <img src="{{ asset('/images/' ~ page.filename) }}">
                             <span>{{ page.getTranslationsByLang(app.session.get('lang'))|capitalize  }}</span>
@@ -94,7 +97,7 @@
         :root {
             --column:5;
             --row: 4;
-            --background: #c3c3c3;
+            --background: #ebebeb;
             --backgroundCell: white;
             --backgroundTab: #000;
             --border:none;

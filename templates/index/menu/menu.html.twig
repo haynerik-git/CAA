@@ -23,11 +23,11 @@
         </div>
     </div>
 
-    <div class="grid-cell grid-cell-menu pageLink"
-            {% if prevPage is not null and nextPage is null %}
+    <div class="grid-cell grid-cell-menu pageBackLink"
+{#            {% if prevPage is not null and nextPage is null %}#}
 {#         data-id="{{ pageOrder.getPagePicto().id }}"#}
-                 data-id="{{ prevPage.id }}"
-            {% endif %}
+                 data-id="{{ page.id }}"
+{#            {% endif %}#}
 {#         onclick="$('.categories-container').show();$('.word-container').hide();"#}
     >
         <div class="containerImage">

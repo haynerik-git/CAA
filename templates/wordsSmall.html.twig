@@ -1,7 +1,7 @@
 {#{% set action = "actionWord" %}#}
-{% set sentence = sentence ~ ' ' ~ word.getWordTranslationsByLang(app.session.get('lang'))  %}
+{#{% set sentence = sentence ~ ' ' ~ word.getWordTranslationsByLang(app.session.get('lang'))  %}#}
 <div class="box cell image-checkbox"
-     onclick='{{ action }}("{{ loop.index }}", "{{ word.getWordTranslationsByLang(app.session.get('lang')) }}", {{ cat.id }}, 1);
+     onclick='{{ action }}("{{ loop.index }}", "", 0, 1);
              $(this).toggleClass("image-checkbox-checked")
              '
      data-wordId="{{ word.id }}"
@@ -22,4 +22,5 @@
 {#    <img su-media-id="{{ word.name }}"  src="{{ asset('images/' ~ word.filename) }}" alt="{{ word.name }}" style="width: 30px;">#}
 {#    <span>{{ word.getWordTranslationsByLang(app.session.get('lang')) }}</span>#}
 </div>
+
 

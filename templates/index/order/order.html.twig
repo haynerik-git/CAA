@@ -37,7 +37,11 @@
         </div>
     {% elseif pageOrder.type == 'page'  %}
 
-        <div class="grid-cell {{ sizeCellClass }} pageLink" data-id="{{ pageOrder.getPagePicto().id }}" data-prevPage="{{ page.id }}" >
+        <div class="grid-cell {{ sizeCellClass }} pageLink" data-id="{{ pageOrder.getPagePicto().id }}" data-prevPage="{{ page.id }}"
+        {% if pageOrder.getPagePicto().isAddHasWord() %}
+             data-description="{{ pageOrder.getPagePicto().getTranslationsByLang(app.session.get('lang')) }}"
+        {% endif %}
+        >
             <div class="containerImage"
                  style="
                     background:
@@ -48,9 +52,9 @@
                 <img src="{{ asset('/images/' ~ pageOrder.getPagePicto().filename) }}" />
                 <span class="text-overlay"> {{ pageOrder.getPagePicto().getTranslationsByLang(app.session.get('lang'))|capitalize }}</span>
             </div>
-            <span class="material-icons folder">
-                            folder_open
-                        </span>
+{#            <span class="material-icons folder">#}
+{#                            folder_open#}
+{#                        </span>#}
         </div>
     {% elseif pageOrder.type == 'input' %}
         <div class="grid-cell {{ sizeCellClass }}">

@@ -70,6 +70,10 @@ class Page
     #[ORM\Column(nullable: true)]
     private ?bool $visible = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $addHasWord = null;
+    
+
     public function __construct()
     {
         $this->pageOrders = new ArrayCollection();
@@ -373,4 +377,17 @@ class Page
     {
         return (new \ReflectionClass($this))->getShortName();
     }
+
+    public function isAddHasWord(): ?bool
+    {
+        return $this->addHasWord;
+    }
+
+    public function setAddHasWord(?bool $addHasWord): static
+    {
+        $this->addHasWord = $addHasWord;
+
+        return $this;
+    }
+
 }

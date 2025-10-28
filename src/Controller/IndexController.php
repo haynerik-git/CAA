@@ -28,6 +28,7 @@ use App\Entity\UserCategories;
 //use Doctrine\Inflector\Rules\Word;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +39,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class IndexController extends AbstractController
 {
     #[Route('/', name: 'app_index')]
-    public function index(WordRepository $word,PageRepository $page, SessionInterface $session, Request $request): Response
+    public function index(?bool $ajaxpost, WordRepository $word,PageRepository $page, SessionInterface $session, Request $request): Response
     {
         if(!$session->has('lang'))
             $session->set('lang', 1);
@@ -46,8 +47,10 @@ class IndexController extends AbstractController
         $ajax = false;
         if(!empty($post_data) && array_key_exists('ajax', $post_data))
             $ajax = $post_data['ajax'];
+        elseif ($ajaxpost)
+            $ajax = $ajaxpost;
 
-
+//dd($ajax);
 //        dd($post_data);
         $res = $page->findPageByOrder();
         $wordsSession = $session->get('words');
@@ -55,12 +58,16 @@ class IndexController extends AbstractController
 
         if(empty($wordsSession)) {
             $wordsSession = $words = [];
-            $session->set('words',[]);
+            $session->set('words', []);
         }
         $cat = ["id"=>0];
         foreach ($wordsSession as $wordObj) {
-            $words[] =  $word->find($wordObj['id']);
+            if($wordObj['type'] == 'word' )
+                $words[] =  $word->find($wordObj['id']);
+            elseif ($wordObj['type'] == 'categorie' )
+                $words[] =  $page->find($wordObj['id']);
         }
+//        dd($words);
 
         return $this->render('index/index.html.twig', [
             'words' => $words,
@@ -131,6 +138,98 @@ class IndexController extends AbstractController
         ]);
     }
 
+
+    #[Route('/pageBackAjax/{id}', name: 'app_pageBackAjax')]
+    public function pageBackAjax(int $id, WordRepository $word, PageRepository $page, UserCategoriesRepository $userCategoriesRepository, SessionInterface $session, Request $request): Response
+    {
+        if(!$session->has('lang'))
+            $session->set('lang', 1);
+
+        $post_data = json_decode($request->getContent(), true);
+
+        $wordsSession = $session->get('words');
+        array_splice($wordsSession, -1, 1,);
+        $lastIndexSession = array_key_last($wordsSession);
+//        dd($wordsSession[$lastIndexSession]);
+
+        if ( count($wordsSession) != 0 && $wordsSession[$lastIndexSession]['type'] == 'categorie')
+            $res = $page->find($wordsSession[$lastIndexSession]['id']);
+        elseif (count($wordsSession) != 0 && $wordsSession[$lastIndexSession]['type'] == 'word')
+            $res = $page->find($id);
+        elseif (count($wordsSession) == 0) {
+//            dd('home');
+            $session->set('words',$wordsSession);
+            $response = $this->forward('App\Controller\IndexController::index', [
+//                'thisname' => 'name',
+                'ajaxpost' => true,
+
+            ]);
+            return $response;
+        }
+//
+//        $prev = $res->getDisplayOrder();
+//        $next = $res->getDisplayOrder();
+//        if(array_key_exists('prevPage', $post_data)) {
+//            $prev = $post_data['prevPage'];
+//            $nextPage = null;
+//            $prevPage = $page->find($prev);
+////            dd($post_data);
+//        }
+//        else {
+//            $nextPage = $page->findNextByOrder($next);
+//            $prevPage = $page->findPrevByOrder($prev);
+//        }
+
+//dd($res->getDisplayOrder());
+//        $pages = $page->findAll();
+
+//        dd($prevPage);
+        $cats = []; //$userCategoriesRepository->findAll();
+        $res2 = $res->getPageOrders();
+
+//        $wordsSession = $session->set('words', []);
+        if(empty($wordsSession))
+            $wordsSession = $words = [];
+
+//        if($res)
+//        $lastIndex = array_key_last($post_data['lastWord']);
+//        $lastIndexSession = array_key_last($session->get('words'));
+//
+//        if($lastIndexSession === null) {
+//            $wordsSession = array_merge($session->get('words'), array($post_data['lastWord'][$lastIndex]));
+//        }
+//        elseif ( $session->get('words')[$lastIndexSession]['id'] != $post_data['lastWord'][$lastIndex]['id'] ){
+//            $wordsSession = array_merge($session->get('words'), array($post_data['lastWord'][$lastIndex]));
+//        }
+
+        $session->set('words',$wordsSession);
+//        dd($wordsSession);
+
+        $cat = ["id"=>0];
+        foreach ($wordsSession as $wordObj) {
+            if($wordObj['type'] == 'word' )
+                $words[] =  $word->find($wordObj['id']);
+            elseif ($wordObj['type'] == 'categorie' )
+                $words[] =  $page->find($wordObj['id']);
+
+        }
+
+
+//dd($words);
+        return $this->render('index/pageAjax.html.twig', [
+            'words' => $words,
+            'cat' => $cat,
+            'pageOrders' => $res2,
+//            'pages' => $pages,
+            'cats' => $cats,
+            'col' => $res->getNbCol(),
+            'row' => $res->getNbRow(),
+            'page' => $res,
+            'nextPage' => null,
+            'prevPage' => null,
+        ]);
+    }
+
     #[Route('/pageAjax/{id}', name: 'app_pageAjax')]
     public function pageAjax(int $id ,WordRepository $word, PageRepository $page, UserCategoriesRepository $userCategoriesRepository, SessionInterface $session, Request $request): Response
     {
@@ -153,7 +252,6 @@ class IndexController extends AbstractController
             $prevPage = $page->findPrevByOrder($prev);
         }
 
-
 //dd($res->getDisplayOrder());
 //        $pages = $page->findAll();
 
@@ -166,10 +264,20 @@ class IndexController extends AbstractController
         if(empty($wordsSession))
             $wordsSession = $words = [];
 
+//        if($res)
         $lastIndex = array_key_last($post_data['lastWord']);
-        $wordsSession = array_merge($session->get('words'), array($post_data['lastWord'][$lastIndex]));
+        $lastIndexSession = array_key_last($session->get('words'));
 
+        if($lastIndexSession === null) {
+            $wordsSession = array_merge($session->get('words'), array($post_data['lastWord'][$lastIndex]));
+        }
+        elseif ( $session->get('words')[$lastIndexSession]['id'] != $post_data['lastWord'][$lastIndex]['id'] ){
+            $wordsSession = array_merge($session->get('words'), array($post_data['lastWord'][$lastIndex]));
+        }
+
+        $session->set('words',$wordsSession);
 //        dd($wordsSession);
+
         $cat = ["id"=>0];
         foreach ($wordsSession as $wordObj) {
             if($wordObj['type'] == 'word' )
@@ -178,6 +286,8 @@ class IndexController extends AbstractController
                 $words[] =  $page->find($wordObj['id']);
 
         }
+
+
 //dd($words);
         return $this->render('index/pageAjax.html.twig', [
             'words' => $words,
@@ -869,7 +979,7 @@ class IndexController extends AbstractController
     }
 
     #[Route('/listWord', name: 'app_index_listWord')]
-    public function listWord(Request $request,WordRepository $word, SessionInterface $session): Response
+    public function listWord(Request $request,WordRepository $word, SessionInterface $session, PageRepository $page): Response
     {
 
         $post_data = json_decode($request->getContent(), true);
@@ -903,7 +1013,10 @@ class IndexController extends AbstractController
         $cat = ["id"=>0];
 //dd($wordsNeeded);
         foreach ($wordsNeeded as $wordObj) {
-            $wordsResult[] =  $word->find($wordObj['id']);
+            if($wordObj['type'] == 'word' )
+                $wordsResult[] =  $word->find($wordObj['id']);
+            elseif ($wordObj['type'] == 'categorie' )
+                $wordsResult[] =  $page->find($wordObj['id']);
         }
 
         return $this->render('index/listWord.html.twig', [
