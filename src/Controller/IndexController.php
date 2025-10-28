@@ -29,6 +29,7 @@ use App\Entity\UserCategories;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use phpDocumentor\Reflection\Types\Boolean;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,10 +40,13 @@ use Symfony\Component\Filesystem\Filesystem;
 class IndexController extends AbstractController
 {
     #[Route('/', name: 'app_index')]
-    public function index(?bool $ajaxpost, WordRepository $word,PageRepository $page, SessionInterface $session, Request $request): Response
+    public function index(?bool $ajaxpost, WordRepository $word,PageRepository $page, SessionInterface $session, Request $request, Security $security): Response
     {
+
+//        dd($security->getUser());
         if(!$session->has('lang'))
-            $session->set('lang', 1);
+            $session->set('lang', $security->getUser()->getLang()->getId());
+
         $post_data = json_decode($request->getContent(), true);
         $ajax = false;
         if(!empty($post_data) && array_key_exists('ajax', $post_data))
@@ -53,6 +57,7 @@ class IndexController extends AbstractController
 //dd($ajax);
 //        dd($post_data);
         $res = $page->findPageByOrder();
+//        $res = $security->getUser()->getPages();
         $wordsSession = $session->get('words');
 //        dd($wordsSession);
 
