@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\PageTranslation;
+use App\Form\PageType;
+use App\Form\WordType;
 use App\Repository\CategoriesRepository;
 use App\Repository\PageTranslationRepository;
 use App\Repository\UserRepository;
@@ -520,6 +522,8 @@ class IndexController extends AbstractController
         $langs = $langRepository->findAll();
         $actions = [];//$actionRepository->findAll();
 
+        $form = $this->createForm(PageType::class, $res);
+
 //dd($res->getPageOrders());
         return $this->render('index/pageEditor.html.twig', [
             'page' => $res,
@@ -532,7 +536,8 @@ class IndexController extends AbstractController
             'langs' => $langs,
             'actions' => $actions,
             'config' => $config,
-            'pages' => $pages
+            'pages' => $pages,
+            'form' => $form,
         ]);
     }
 
@@ -963,7 +968,7 @@ class IndexController extends AbstractController
 
 
     #[Route('/RenderSaveWords', name: 'app_index_renderSaveWords')]
-    public function renderSaveWords(Request $request,WordRepository $word, SessionInterface $session): Response
+    public function renderSaveWords(Request $request,WordRepository $word, SessionInterface $session, PageRepository $page): Response
     {
         $saveWords = $session->get('saveWords');
 
@@ -972,7 +977,11 @@ class IndexController extends AbstractController
 
         foreach ($saveWords as $key => $wordListObj) {
             foreach ($wordListObj as $key2 => $wordObj) {
-                $wordsResult[$key][$key2] =  $word->find($wordObj['id']);
+//                =  $word->find($wordObj['id']);
+                if($wordObj['type'] == 'word' )
+                    $wordsResult[$key][$key2] =  $word->find($wordObj['id']);
+                elseif ($wordObj['type'] == 'categorie' )
+                    $wordsResult[$key][$key2] =  $page->find($wordObj['id']);
             }
         }
 

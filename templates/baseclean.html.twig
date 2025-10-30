@@ -1548,6 +1548,15 @@ console.log(language)
     // })
 
 
+    $(document).on("click", ".nav-links .link", function(ev) {
+        // e.preventDefault();
+        nav.classList.toggle('nav-open');
+        lineOne.classList.toggle('line-cross');
+        lineTwo.classList.toggle('line-fade-out');
+        lineThree.classList.toggle('line-cross');
+        link.classList.toggle('fade-in');
+
+    })
     $(document).on("click", ".grid-container-menu .menu-btn", function(ev) {
 
         nav.classList.toggle('nav-open');

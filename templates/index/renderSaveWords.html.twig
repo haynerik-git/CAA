@@ -38,7 +38,13 @@
         <div id="grid-container"  >
             {% for words in wordsResult %}
                 {% for word in words %}
-                    {{ word.name }}
+                    {% if word.getClassName == 'Word' %}
+                        {{ word.getWordTranslationsByLang(app.session.get('lang')) }}
+                    {% elseif word.getClassName == 'Page' %}
+                        {% if word.isAddHasWord %}
+                            {{ word.getTranslationsByLang(app.session.get('lang')) }}
+                        {% endif %}
+                    {% endif %}
                 {% endfor %}
 <br>
                 {% include('/index/listWord.html.twig') %}
