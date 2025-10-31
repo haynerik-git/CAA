@@ -483,7 +483,7 @@
             max: 10,
             value: {{ col ?? 2 }},
             slide: function( event, ui ) {
-                $('#inputSlider-range-max-column').val( ui.value)
+                $('#page_nbCol').val( ui.value)
                 $('#spanSlider-range-max-column').html( ui.value)
                 myFunction_setAjax('--column', ui.value)
                 updateHeader()
@@ -497,7 +497,7 @@
             max: 10,
             value: {{ row ?? 2 }},
             slide: function( event, ui ) {
-                $('#inputSlider-range-max-row').val( ui.value)
+                $('#page_nbRow').val( ui.value)
                 $('#spanSlider-range-max-row').html( ui.value)
                 myFunction_setAjax('--row', ui.value)
                 // $( "#column" ).val( ui.value );
@@ -567,7 +567,7 @@
 
 
 function updateHeader() {
-        var nbItem = $('#inputSlider-range-max-column').val() * $('#slider-range-max-column').val()
+        var nbItem = $('#page_nbCol').val() * $('#slider-range-max-column').val()
 
         console.log(nbItem)
 }
@@ -577,7 +577,7 @@ function updateHeader() {
 
     function addBlockMissing() {
 
-        var nbItem = $('#inputSlider-range-max-column').val() * $('#inputSlider-range-max-row').val()
+        var nbItem = $('#page_nbCol').val() * $('#page_nbRow').val()
         console.log(nbItem)
         $(document).find( ".page" ).each(function() {
             var current = $(document).find('.grid-cell').length
@@ -979,7 +979,7 @@ function toggleDrag() {
 
             <section style="margin: 10px" id="frm-contact">
                 <div>
-                    {{ form(form) }}
+{#                    {{ form(form) }}#}
 
                     <h1>Basic</h1>
                     {#               col <input type="text" id="column" name="column" value="5" >#}
@@ -987,7 +987,8 @@ function toggleDrag() {
 
                     <div class="nice-form-group">
                         <label>background</label>
-                        <input type="color" name="background" value="{{ page.background|default('#ffffff') }}" onchange="myFunction_setAjax('--background', this.value)">
+                        {{ form_widget(form.background) }}
+{#                        <input type="color" name="background" value="{{ page.background|default('#ffffff') }}" onchange="myFunction_setAjax('--background', this.value)">#}
                     </div>
 
                     <div class="nice-form-group">
@@ -1011,7 +1012,8 @@ function toggleDrag() {
 
                         </label>
                          <div id="slider-range-max-column"></div>
-                        <input id="inputSlider-range-max-column" value="{{ col }}" style="display: block" type="hidden" disabled />
+                        {{ form_widget(form.nbCol) }}
+{#                        <input id="inputSlider-range-max-column" value="{{ col }}" style="display: block" type="hidden" disabled />#}
                     </div>
 
                     <div class="nice-form-group">
@@ -1020,7 +1022,8 @@ function toggleDrag() {
 
                         </label>
                         <div id="slider-range-max-row"></div>
-                        <input id="inputSlider-range-max-row" value="{{ row }}" style="display: block" type="hidden" disabled />
+                        {{ form_widget(form.nbRow) }}
+{#                        <input id="inputSlider-range-max-row" value="{{ row }}" style="display: block" type="hidden" disabled />#}
                     </div>
 
                     <div class="nice-form-group">
@@ -1030,6 +1033,25 @@ function toggleDrag() {
                             <small></small>
                         </label>
                     </div>
+
+                    <div class="nice-form-group">
+                        {{ form_widget(form.addHasWord) }}
+{#                        <input type="checkbox" id="drag" class="switch" checked onclick="toggleDrag()" />#}
+                        <label >
+                            Speak on Click
+                            <small></small>
+                        </label>
+                    </div>
+
+                    <div class="nice-form-group">
+                        {{ form_widget(form.visible) }}
+                        {#                        <input type="checkbox" id="drag" class="switch" checked onclick="toggleDrag()" />#}
+                        <label >
+                            Visible on Homa page
+                            <small></small>
+                        </label>
+                    </div>
+
                 </div>
             </section>
             <section style="margin: 10px" >
@@ -1039,6 +1061,7 @@ function toggleDrag() {
                         <label>
                         background cell
                         </label>
+
                         <input type="color" name="backgroundCell" value="{{ page.backgroundCell|default('#ffffff') }}" onchange="myFunction_setAjax('--backgroundCell', this.value)">
                     </div>
 {#                    <div class="nice-form-group">#}

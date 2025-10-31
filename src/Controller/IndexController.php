@@ -759,6 +759,18 @@ class IndexController extends AbstractController
         elseif ( $key == '--colorDescription') {
             $page->setCOlorDescription($value);
         }
+        elseif ( $key == '--addHasWord') {
+            if( $value == "true")
+                $page->setAddHasWord(1);
+            else
+                $page->setAddHasWord(0);
+        }
+        elseif ( $key == '--visible') {
+            if( $value == "true")
+                $page->setAddHasWord(1);
+            else
+                $page->setAddHasWord(0);
+        }
 
 //        $page->setFileName($id.'-'.$name . '.png');
 
